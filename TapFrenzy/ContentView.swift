@@ -184,10 +184,10 @@ struct ContentView: View {
     }
     
     var gameOverScreen: some View {
-        VStack(spacing: 24) {
+        VStack(spacing: 25) {
             
             Text("GAME OVER")
-                .font(.system(size: 40, weight: .black))
+                .font(.system(size: 50, weight: .black))
                 .foregroundColor(.red)
             
             Text("Score")
