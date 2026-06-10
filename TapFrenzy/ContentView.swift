@@ -194,7 +194,7 @@ struct ContentView: View {
                 .foregroundColor(.gray)
             
             Text("\(score)")
-                .font(.system(size: 70, weight: .black))
+                .font(.system(size: 90, weight: .black))
                 .foregroundColor(.white)
             
             if score > 0 && score >= highScore {
