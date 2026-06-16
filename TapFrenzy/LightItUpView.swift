@@ -47,7 +47,7 @@ struct LightItUpView: View {
         levels[currentLevel]
     }
     
-    // grid columns based on card count
+    // grid columns
     var columns: [GridItem] {
         let cols = currentLevel < 2 ? 3 : 3
         return Array(repeating: GridItem(.flexible(), spacing: 12), count: cols)
@@ -283,19 +283,17 @@ struct LightItUpView: View {
     }
     
     func lightUpCards() {
-        // turn all cards off first
+        
         for i in cards.indices {
             cards[i].isLit = false
         }
         
-        // pick random cards to light up
         var indices = Array(0..<cards.count).shuffled()
         let count = min(level.litCount, cards.count)
         for i in 0..<count {
             cards[indices[i]].isLit = true
         }
         
-        // turn off after lit window
         DispatchQueue.main.asyncAfter(deadline: .now() + level.litWindow * 0.85) {
             for i in cards.indices {
                 cards[i].isLit = false
@@ -315,7 +313,7 @@ struct LightItUpView: View {
                 }
             }
         } else {
-            // wrong tap - penalty
+            // wrong tap = penalty
             score = max(0, score - 5)
         }
     }
