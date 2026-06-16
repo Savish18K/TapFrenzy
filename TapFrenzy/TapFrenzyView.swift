@@ -85,8 +85,16 @@ struct TapFrenzyView: View {
                 dismiss()
             } label: {
                 Text("Back to Home")
-                    .foregroundColor(.gray)
-                    .font(.subheadline)
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 30)
+                        .padding(.vertical, 12)
+                        .background(Color.green.opacity(0.3))
+                        .cornerRadius(12)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(Color.green, lineWidth: 1.5)
+                        )
             }
         }
     }
