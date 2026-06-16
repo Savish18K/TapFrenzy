@@ -288,7 +288,7 @@ struct LightItUpView: View {
             cards[i].isLit = false
         }
         
-        var indices = Array(0..<cards.count).shuffled()
+        let indices = Array(0..<cards.count).shuffled()
         let count = min(level.litCount, cards.count)
         for i in 0..<count {
             cards[indices[i]].isLit = true
