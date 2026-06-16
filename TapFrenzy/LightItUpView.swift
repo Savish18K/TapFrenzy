@@ -252,10 +252,28 @@ struct LightItUpView: View {
             Button {
                 dismiss()
             } label: {
-                Text("Choose Another Game")
-                    .foregroundColor(.gray)
-                    .font(.subheadline)
-            }
+                HStack(spacing: 8) {
+                       Image(systemName: "gamecontroller.fill")
+                           .font(.system(size: 14))
+                       Text("Choose Another Game")
+                           .font(.system(size: 16, weight: .bold))
+                   }
+                   .foregroundColor(.white)
+                   .padding(.horizontal, 30)
+                   .padding(.vertical, 12)
+                   .background(
+                       LinearGradient(
+                           colors: [Color.blue.opacity(0.6), Color.purple.opacity(0.6)],
+                           startPoint: .leading,
+                           endPoint: .trailing
+                       )
+                   )
+                   .cornerRadius(12)
+                   .overlay(
+                       RoundedRectangle(cornerRadius: 12)
+                           .stroke(Color.blue, lineWidth: 1.5)
+                   )
+               }
         }
     }
     
