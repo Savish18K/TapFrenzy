@@ -1,5 +1,5 @@
 import SwiftUI
-
+import Combine
 struct ContentView: View {
     var body: some View {
         NavigationStack {
@@ -9,25 +9,26 @@ struct ContentView: View {
                 VStack(spacing: 40) {
                     
                     VStack(spacing: 8) {
-                        Text("GAME")
-                            .font(.system(size: 38, weight: .black))
-                            .foregroundColor(.white)
-                        Text(" Zone")
-                            .font(.system(size: 38, weight: .black))
-                            .foregroundColor(.clear)
-                        overlay(
-                            LinearGradient(
-                                colors: [Color .green, Color.blue, Color.purple],
-                                           startPoint: .leading,
-                                endPoint: .trailing
-                                          )
-                            .mask(
-                                   Text("Zone")
+                        HStack(spacing: 0) {
+                            Text("GAME")
                                 .font(.system(size: 38, weight: .black))
-                                  )
-                        )
-                    }
-                                               
+                                .foregroundColor(.white)
+                            Text(" ZONE")
+                                .font(.system(size: 38, weight: .black))
+                                .foregroundColor(.clear)
+                                .overlay(
+                                    LinearGradient(
+                                        colors: [Color.green, Color.blue, Color.purple],
+                                        startPoint: .leading,
+                                        endPoint: .trailing
+                                    )
+                                    .mask(
+                                        Text(" ZONE")
+                                            .font(.system(size: 38, weight: .black))
+                                    )
+                                )
+                        }
+                        
                         Text("Choose a game to play")
                             .font(.subheadline)
                             .foregroundColor(.gray)
@@ -90,7 +91,7 @@ struct ContentView: View {
             .navigationBarHidden(true)
         }
     }
-
+}
 
 #Preview {
     ContentView()

@@ -1,18 +1,17 @@
 import SwiftUI
 import Combine
-// card model
-struct Card: Identifiable {
-    let id: Int
-    var isLit: Bool = false
-}
 
-// level system
 struct Level {
     let cardCount: Int
     let litWindow: Double
     let litCount: Int
     let color: Color
     let name: String
+}
+
+struct Card: Identifiable {
+    let id: Int
+    var isLit: Bool = false
 }
 
 struct LightItUpView: View {
@@ -28,13 +27,10 @@ struct LightItUpView: View {
     @State private var gameOver = false
     @State private var currentLevel = 0
     @State private var showLevelUp = false
+    @State private var tickCount = 0
     
-    // timer for countdown
+    let masterTimer = Timer.publish(every: 0.4, on: .main, in: .common).autoconnect()
     let roundTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
-    
-    // timer for lighting up cards
-    @State private var litTimer: Timer.TimerPublisher = Timer.publish(every: 1.5, on: .main, in: .common)
-    @State private var litTimerConnection: Cancellable? = nil
     
     let levels = [
         Level(cardCount: 3, litWindow: 1.5, litCount: 1, color: .green,  name: "L1"),
@@ -47,10 +43,12 @@ struct LightItUpView: View {
         levels[currentLevel]
     }
     
-    // grid columns
     var columns: [GridItem] {
-        let cols = currentLevel < 2 ? 3 : 3
-        return Array(repeating: GridItem(.flexible(), spacing: 12), count: cols)
+        Array(repeating: GridItem(.flexible(), spacing: 12), count: 3)
+    }
+    
+    var ticksPerLight: Int {
+        max(1, Int(level.litWindow / 0.4))
     }
     
     var body: some View {
@@ -65,12 +63,10 @@ struct LightItUpView: View {
                 gameScreen
             }
             
-            // level up flash
             if showLevelUp {
                 Color.white.opacity(0.15)
                     .ignoresSafeArea()
                     .allowsHitTesting(false)
-                
                 Text("LEVEL UP!")
                     .font(.system(size: 36, weight: .black))
                     .foregroundColor(.white)
@@ -85,6 +81,21 @@ struct LightItUpView: View {
                 checkLevelUp()
             } else {
                 endGame()
+            }
+        }
+        .onReceive(masterTimer) { _ in
+            guard gameStarted && !gameOver else { return }
+            tickCount += 1
+            
+            if tickCount == ticksPerLight / 2 {
+                for i in cards.indices {
+                    cards[i].isLit = false
+                }
+            }
+            
+            if tickCount >= ticksPerLight {
+                tickCount = 0
+                lightUpCards()
             }
         }
     }
@@ -132,25 +143,22 @@ struct LightItUpView: View {
                 dismiss()
             } label: {
                 Text("Back to Home")
-                        .font(.system(size: 16, weight: .bold))
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 30)
-                        .padding(.vertical, 12)
-                        .background(Color.blue.opacity(0.3))
-                        .cornerRadius(12)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(Color.blue, lineWidth: 1.5)
-                        )
-                
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 30)
+                    .padding(.vertical, 12)
+                    .background(Color.blue.opacity(0.3))
+                    .cornerRadius(12)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(Color.blue, lineWidth: 1.5)
+                    )
             }
         }
     }
     
     var gameScreen: some View {
         VStack(spacing: 0) {
-            
-            // top bar
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
                     Text("SCORE")
@@ -188,20 +196,20 @@ struct LightItUpView: View {
             
             Spacer()
             
-            // card grid
             LazyVGrid(columns: columns, spacing: 12) {
                 ForEach(cards) { card in
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 14)
-                            .fill(card.isLit ? level.color : Color(red: 0.15, green: 0.17, blue: 0.22))
-                            .frame(height: 100)
-                            .scaleEffect(card.isLit ? 1.06 : 1.0)
-                            .shadow(color: card.isLit ? level.color.opacity(0.7) : .clear, radius: 12)
-                            .animation(.easeInOut(duration: 0.2), value: card.isLit)
-                    }
-                    .onTapGesture {
-                        cardTapped(card)
-                    }
+                    RoundedRectangle(cornerRadius: 14)
+                        .fill(card.isLit ? level.color : Color(red: 0.15, green: 0.17, blue: 0.22))
+                        .frame(height: 100)
+                        .scaleEffect(card.isLit ? 1.06 : 1.0)
+                        .shadow(
+                            color: card.isLit ? level.color.opacity(0.7) : .clear,
+                            radius: 12
+                        )
+                        .animation(.easeInOut(duration: 0.2), value: card.isLit)
+                        .onTapGesture {
+                            cardTapped(card)
+                        }
                 }
             }
             .padding(.horizontal, 24)
@@ -253,27 +261,27 @@ struct LightItUpView: View {
                 dismiss()
             } label: {
                 HStack(spacing: 8) {
-                       Image(systemName: "gamecontroller.fill")
-                           .font(.system(size: 14))
-                       Text("Choose Another Game")
-                           .font(.system(size: 16, weight: .bold))
-                   }
-                   .foregroundColor(.white)
-                   .padding(.horizontal, 30)
-                   .padding(.vertical, 12)
-                   .background(
-                       LinearGradient(
-                           colors: [Color.blue.opacity(0.6), Color.purple.opacity(0.6)],
-                           startPoint: .leading,
-                           endPoint: .trailing
-                       )
-                   )
-                   .cornerRadius(12)
-                   .overlay(
-                       RoundedRectangle(cornerRadius: 12)
-                           .stroke(Color.blue, lineWidth: 1.5)
-                   )
-               }
+                    Image(systemName: "gamecontroller.fill")
+                        .font(.system(size: 14))
+                    Text("Choose Another Game")
+                        .font(.system(size: 16, weight: .bold))
+                }
+                .foregroundColor(.white)
+                .padding(.horizontal, 30)
+                .padding(.vertical, 12)
+                .background(
+                    LinearGradient(
+                        colors: [Color.blue.opacity(0.6), Color.purple.opacity(0.6)],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
+                .cornerRadius(12)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color.blue, lineWidth: 1.5)
+                )
+            }
         }
     }
     
@@ -281,66 +289,45 @@ struct LightItUpView: View {
         score = 0
         timeRemaining = 60
         gameOver = false
-        gameStarted = true
         currentLevel = 0
-        setupCards()
-        startLitTimer()
+        tickCount = 0
+        cards = (0..<levels[0].cardCount).map { Card(id: $0) }
+        gameStarted = true
     }
     
     func endGame() {
+        gameStarted = false
         gameOver = true
-        litTimerConnection?.cancel()
+        for i in cards.indices {
+            cards[i].isLit = false
+        }
         if score > highScore {
             highScore = score
         }
     }
     
-    func setupCards() {
-        cards = (0..<level.cardCount).map { Card(id: $0) }
-    }
-    
-    func startLitTimer() {
-        litTimerConnection?.cancel()
-        litTimerConnection = Timer.publish(every: level.litWindow, on: .main, in: .common)
-            .autoconnect()
-            .sink { _ in
-                guard gameStarted && !gameOver else { return }
-                lightUpCards()
-            }
-    }
-    
     func lightUpCards() {
-        
+        guard !cards.isEmpty && gameStarted else { return }
         for i in cards.indices {
             cards[i].isLit = false
         }
-        
-        let indices = Array(0..<cards.count).shuffled()
+        let shuffled = Array(0..<cards.count).shuffled()
         let count = min(level.litCount, cards.count)
         for i in 0..<count {
-            cards[indices[i]].isLit = true
-        }
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + level.litWindow * 0.85) {
-            for i in cards.indices {
-                cards[i].isLit = false
-            }
+            cards[shuffled[i]].isLit = true
         }
     }
     
     func cardTapped(_ card: Card) {
         guard gameStarted && !gameOver else { return }
-        
         if card.isLit {
-            // correct tap
-            withAnimation {
-                score += 10
-                if let index = cards.firstIndex(where: { $0.id == card.id }) {
+            score += 10
+            if let index = cards.firstIndex(where: { $0.id == card.id }) {
+                withAnimation {
                     cards[index].isLit = false
                 }
             }
         } else {
-            // wrong tap = penalty
             score = max(0, score - 5)
         }
     }
@@ -361,10 +348,8 @@ struct LightItUpView: View {
         
         if newLevel != currentLevel {
             currentLevel = newLevel
-            setupCards()
-            startLitTimer()
-            
-            // show level up flash
+            tickCount = 0
+            cards = (0..<level.cardCount).map { Card(id: $0) }
             showLevelUp = true
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                 showLevelUp = false
