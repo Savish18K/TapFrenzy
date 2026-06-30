@@ -28,6 +28,10 @@ struct LightItUpView: View {
     @State private var currentLevel = 0
     @State private var showLevelUp = false
     @State private var tickCount = 0
+    @State private var playerName = ""
+    @State private var showNameSheet = false
+    
+    
     
     let masterTimer = Timer.publish(every: 0.4, on: .main, in: .common).autoconnect()
     let roundTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
@@ -74,6 +78,34 @@ struct LightItUpView: View {
             }
         }
         .navigationBarHidden(true)
+        .sheet(isPresented: $showNameSheet) {
+
+            VStack(spacing:20){
+
+                Text("Save Your Score")
+                    .font(.largeTitle.bold())
+
+                TextField("Enter your name", text: $playerName)
+                    .textFieldStyle(.roundedBorder)
+                    .padding()
+
+                Button("Save"){
+
+                    let name = playerName.isEmpty ? "Player" : playerName
+
+                    LeaderboardManager.shared.saveScore(
+                        playerName: name,
+                        score: score,
+                        game: "LightItUp"
+                    )
+
+                    showNameSheet = false
+                }
+                .buttonStyle(.borderedProminent)
+
+            }
+            .padding()
+        }
         .onReceive(roundTimer) { _ in
             guard gameStarted && !gameOver else { return }
             if timeRemaining > 0 {
@@ -296,15 +328,21 @@ struct LightItUpView: View {
     }
     
     func endGame() {
+
         gameStarted = false
         gameOver = true
+
         for i in cards.indices {
             cards[i].isLit = false
         }
+
         if score > highScore {
             highScore = score
         }
+
+        showNameSheet = true
     }
+    
     
     func lightUpCards() {
         guard !cards.isEmpty && gameStarted else { return }

@@ -8,6 +8,8 @@ struct QuizRushView: View {
     
     @State private var showResults = false
     @State private var shakeAmount: CGFloat = 0
+    @State private var playerName = ""
+    @State private var showNameSheet = false
     
     var body: some View {
         ZStack {
@@ -27,6 +29,35 @@ struct QuizRushView: View {
             }
         }
         .navigationBarHidden(true)
+        .sheet(isPresented: $showNameSheet) {
+
+            VStack(spacing:20){
+
+                Text("Save Your Score")
+                    .font(.largeTitle.bold())
+
+                TextField("Enter your name", text: $playerName)
+                    .textFieldStyle(.roundedBorder)
+                    .padding()
+
+                Button("Save"){
+
+                    let name = playerName.isEmpty ? "Player" : playerName
+
+                    LeaderboardManager.shared.saveScore(
+                        playerName: name,
+                        score: viewModel.score,
+                        game: "QuizRush"
+                    )
+
+                    showNameSheet = false
+                    showResults = true
+                }
+                .buttonStyle(.borderedProminent)
+
+            }
+            .padding()
+        }
         .task {
             await viewModel.load()
         }
@@ -205,11 +236,14 @@ struct QuizRushView: View {
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             if viewModel.isLastQuestion {
+
                 if viewModel.score > highScore {
                     highScore = viewModel.score
                 }
-                showResults = true
-            } else {
+
+                showNameSheet = true
+            }
+            else {
                 viewModel.nextQuestion()
             }
         }

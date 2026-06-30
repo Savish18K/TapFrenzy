@@ -26,6 +26,8 @@ struct TapFrenzyView: View {
     @State private var bonusUsed = false
     
     @State private var tapScale = CGFloat(1.0)
+    @State private var playerName = ""
+    @State private var showNameSheet = false
     
     let gameTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     let colorTimer = Timer.publish(every: 2, on: .main, in: .common).autoconnect()
@@ -48,7 +50,36 @@ struct TapFrenzyView: View {
                 gameScreen
             }
         }
-        .navigationBarHidden(true)
+        
+    .navigationBarHidden(true)
+    .sheet(isPresented: $showNameSheet) {
+
+        VStack(spacing: 20) {
+
+            Text("Save Your Score")
+                .font(.largeTitle.bold())
+
+            TextField("Enter your name", text: $playerName)
+                .textFieldStyle(.roundedBorder)
+                .padding(.horizontal)
+
+            Button("Save") {
+
+                let name = playerName.isEmpty ? "Player" : playerName
+
+                LeaderboardManager.shared.saveScore(
+                    playerName: name,
+                    score: score,
+                    game: "TapFrenzy"
+                )
+
+                showNameSheet = false
+            }
+            .buttonStyle(.borderedProminent)
+
+        }
+        .padding()
+    }
     }
     
     var startScreen: some View {
@@ -289,10 +320,14 @@ struct TapFrenzyView: View {
     }
     
     func endGame() {
+
         gameOver = true
+
         if score > highScore {
             highScore = score
         }
+
+        showNameSheet = true
     }
     
     func handleTap() {
