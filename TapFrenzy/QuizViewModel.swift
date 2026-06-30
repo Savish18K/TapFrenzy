@@ -30,18 +30,25 @@ class QuizViewModel: ObservableObject {
     }
     
     func load() async {
-        state = .loading
+        await MainActor.run {
+            state = .loading
+        }
+        
         do {
             let fetched = try await service.fetchQuestions()
-            questions = fetched
-            currentIndex = 0
-            score = 0
-            streak = 0
-            selectedAnswer = nil
-            isCorrect = nil
-            state = .loaded
+            await MainActor.run {
+                questions = fetched
+                currentIndex = 0
+                score = 0
+                streak = 0
+                selectedAnswer = nil
+                isCorrect = nil
+                state = .loaded
+            }
         } catch {
-            state = .failed
+            await MainActor.run {
+                state = .failed
+            }
         }
     }
     

@@ -1,5 +1,6 @@
 import SwiftUI
 import Combine
+
 struct ContentView: View {
     var body: some View {
         NavigationStack {
@@ -81,6 +82,30 @@ struct ContentView: View {
                         .overlay(
                             RoundedRectangle(cornerRadius: 16)
                                 .stroke(Color.blue, lineWidth: 1.5)
+                        )
+                    }
+                    .padding(.horizontal, 24)
+                    
+                    // Quiz Rush button
+                    NavigationLink(destination: QuizRushView()) {
+                        VStack(spacing: 10) {
+                            Text("🧠")
+                                .font(.system(size: 50))
+                            Text("QUIZ RUSH")
+                                .font(.system(size: 22, weight: .black))
+                                .foregroundColor(.white)
+                            Text("Answer 10 trivia questions from a live API")
+                                .font(.caption)
+                                .foregroundColor(.white.opacity(0.7))
+                                .multilineTextAlignment(.center)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 30)
+                        .background(Color.orange.opacity(0.2))
+                        .cornerRadius(16)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 16)
+                                .stroke(Color.orange, lineWidth: 1.5)
                         )
                     }
                     .padding(.horizontal, 24)
