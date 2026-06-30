@@ -1,5 +1,4 @@
 import Foundation
-import UIKit
 
 
 struct TriviaResponse: Codable {
@@ -37,12 +36,27 @@ struct Question: Codable, Identifiable {
 // helper to clean up HTML entities the API sends back
 extension String {
     var htmlDecoded: String {
-        guard let data = self.data(using: .utf8) else { return self }
-        guard let attributed = try? NSAttributedString(
-            data: data,
-            options: [.documentType: NSAttributedString.DocumentType.html],
-            documentAttributes: nil
-        ) else { return self }
-        return attributed.string
+        var result = self
+        let replacements: [String: String] = [
+            "&quot;": "\"",
+            "&#039;": "'",
+            "&apos;": "'",
+            "&amp;": "&",
+            "&lt;": "<",
+            "&gt;": ">",
+            "&ldquo;": "\u{201C}",
+            "&rdquo;": "\u{201D}",
+            "&rsquo;": "\u{2019}",
+            "&eacute;": "é",
+            "&uuml;": "ü",
+            "&ouml;": "ö",
+            "&auml;": "ä"
+        ]
+        
+        for (key, value) in replacements {
+            result = result.replacingOccurrences(of: key, with: value)
+        }
+        
+        return result
     }
 }
