@@ -242,7 +242,6 @@ struct QuizRushView: View {
             Button {
                 showResults = false
                 Task {
-                    await viewModel.load()
                 }
             } label: {
                 Text("PLAY AGAIN")
