@@ -30,33 +30,43 @@ struct QuizRushView: View {
         }
         .navigationBarHidden(true)
         .sheet(isPresented: $showNameSheet) {
-
-            VStack(spacing:20){
-
-                Text("Save Your Score")
-                    .font(.largeTitle.bold())
-
-                TextField("Enter your name", text: $playerName)
-                    .textFieldStyle(.roundedBorder)
-                    .padding()
-
-                Button("Save"){
-
-                    let name = playerName.isEmpty ? "Player" : playerName
-
-                    LeaderboardManager.shared.saveScore(
-                        playerName: name,
-                        score: viewModel.score,
-                        game: "QuizRush"
-                    )
-
-                    showNameSheet = false
-                    showResults = true
+            ZStack {
+                Color.black.ignoresSafeArea()
+                VStack(spacing: 20) {
+                    Text("Quiz Complete!")
+                        .font(.system(size: 26, weight: .black))
+                        .foregroundColor(.orange)
+                    Text("Your Score: \(viewModel.score)")
+                        .font(.system(size: 36, weight: .black))
+                        .foregroundColor(.white)
+                    Text("Enter your name to save")
+                        .foregroundColor(.gray)
+                    TextField("Your name", text: $playerName)
+                        .textFieldStyle(.roundedBorder)
+                        .padding(.horizontal, 30)
+                    Button {
+                        LeaderboardManager.shared.saveScore(
+                            playerName: playerName,
+                            score: viewModel.score,
+                            game: "QuizRush"
+                        )
+                        playerName = ""
+                        showNameSheet = false
+                        showResults = true
+                    } label: {
+                        Text("SAVE & CONTINUE")
+                            .font(.system(size: 17, weight: .bold))
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 14)
+                            .background(Color.orange)
+                            .foregroundColor(.black)
+                            .cornerRadius(12)
+                            .padding(.horizontal, 30)
+                    }
                 }
-                .buttonStyle(.borderedProminent)
-
+                .padding()
             }
-            .padding()
+            .presentationDetents([.medium])
         }
         .task {
             await viewModel.load()
@@ -236,11 +246,9 @@ struct QuizRushView: View {
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             if viewModel.isLastQuestion {
-
                 if viewModel.score > highScore {
                     highScore = viewModel.score
                 }
-
                 showNameSheet = true
             }
             else {
@@ -285,6 +293,24 @@ struct QuizRushView: View {
                     .background(Color.orange)
                     .foregroundColor(.black)
                     .cornerRadius(14)
+            }
+            NavigationLink(destination: LeaderboardView(game: "QuizRush")) {
+                HStack {
+                    Image(systemName: "trophy.fill")
+                        .foregroundColor(.yellow)
+                    Text("Leaderboard")
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundColor(.white)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
+                .background(Color.orange.opacity(0.2))
+                .cornerRadius(12)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color.orange, lineWidth: 1.5)
+                )
+                .padding(.horizontal, 40)
             }
             
             Button {

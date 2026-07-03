@@ -79,32 +79,43 @@ struct LightItUpView: View {
         }
         .navigationBarHidden(true)
         .sheet(isPresented: $showNameSheet) {
-
-            VStack(spacing:20){
-
-                Text("Save Your Score")
-                    .font(.largeTitle.bold())
-
-                TextField("Enter your name", text: $playerName)
-                    .textFieldStyle(.roundedBorder)
-                    .padding()
-
-                Button("Save"){
-
-                    let name = playerName.isEmpty ? "Player" : playerName
-
-                    LeaderboardManager.shared.saveScore(
-                        playerName: name,
-                        score: score,
-                        game: "LightItUp"
-                    )
-
-                    showNameSheet = false
+            ZStack {
+                Color.black.ignoresSafeArea()
+                VStack(spacing: 20) {
+                    Text("Time's Up!")
+                        .font(.system(size: 26, weight: .black))
+                        .foregroundColor(.blue)
+                    Text("Your Score: \(score)")
+                        .font(.system(size: 36, weight: .black))
+                        .foregroundColor(.white)
+                    Text("Enter your name to save")
+                        .foregroundColor(.gray)
+                    TextField("Your name", text: $playerName)
+                        .textFieldStyle(.roundedBorder)
+                        .padding(.horizontal, 30)
+                    Button {
+                        LeaderboardManager.shared.saveScore(
+                            playerName: playerName,
+                            score: score,
+                            game: "LightItUp"
+                        )
+                        playerName = ""
+                        showNameSheet = false
+                    } label: {
+                        Text("SAVE & CONTINUE")
+                            .font(.system(size: 17, weight: .bold))
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 14)
+                            .background(Color.blue)
+                            .foregroundColor(.white)
+                            .cornerRadius(12)
+                            .padding(.horizontal, 30)
+                    }
                 }
-                .buttonStyle(.borderedProminent)
-
+                .padding()
             }
-            .padding()
+            .presentationDetents([.medium])
+        
         }
         .onReceive(roundTimer) { _ in
             guard gameStarted && !gameOver else { return }
@@ -169,6 +180,24 @@ struct LightItUpView: View {
                     .background(Color.blue)
                     .foregroundColor(.white)
                     .cornerRadius(14)
+            }
+            NavigationLink(destination: LeaderboardView(game: "LightItUp")) {
+                HStack {
+                    Image(systemName: "trophy.fill")
+                        .foregroundColor(.yellow)
+                    Text("Leaderboard")
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundColor(.white)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
+                .background(Color.blue.opacity(0.2))
+                .cornerRadius(12)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color.blue, lineWidth: 1.5)
+                )
+                .padding(.horizontal, 40)
             }
             
             Button {
