@@ -34,10 +34,10 @@ struct LightItUpView: View {
     @State private var showNameSheet = false
     @State private var lostLifeFlash = false   // brief red flash on life lost
 
-    // Generation counter — bumped on level-up/game-end so stale closures become no-ops
+    
     @State private var generation = 0
 
-    // 1-second countdown timer
+
     let roundTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     // Score thresholds: L1=0, L2=30, L3=70, L4=120
