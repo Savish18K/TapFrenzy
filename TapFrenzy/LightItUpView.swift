@@ -78,6 +78,19 @@ struct LightItUpView: View {
             }
         }
         .navigationBarHidden(true)
+        .overlay(alignment: .topLeading) {
+            Button {
+                dismiss()
+            } label: {
+                Image(systemName: "chevron.left")
+                    .font(.title3)
+                    .fontWeight(.bold)
+                    .foregroundColor(.white)
+                    .padding(12)
+                    .background(Circle().fill(Color.white.opacity(0.2)))
+            }
+            .padding(.leading, 16)
+        }
         .sheet(isPresented: $showNameSheet) {
             ZStack {
                 Color.black.ignoresSafeArea()
