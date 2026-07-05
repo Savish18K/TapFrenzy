@@ -32,7 +32,7 @@ struct LightItUpView: View {
     @State private var showLevelUp = false
     @State private var playerName = ""
     @State private var showNameSheet = false
-    @State private var lostLifeFlash = false   // brief red flash on life lost
+    @State private var lostLifeFlash = false   // brief  flash on life lost
 
     
     @State private var generation = 0
@@ -54,7 +54,7 @@ struct LightItUpView: View {
         Array(repeating: GridItem(.flexible(), spacing: 12), count: 3)
     }
 
-    // ─────────────────────────────────────────────────────────────────────
+  
     // MARK: Body
     // ─────────────────────────────────────────────────────────────────────
     var body: some View {

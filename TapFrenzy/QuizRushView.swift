@@ -564,9 +564,9 @@ struct QuizRushView: View {
         }
     }
 
-    // ─────────────────────────────────────────────────────────────────────
+   
     // MARK: Name sheet
-    // ─────────────────────────────────────────────────────────────────────
+    
     var nameSheet: some View {
         ZStack {
             bgBase.ignoresSafeArea()
@@ -648,9 +648,9 @@ struct QuizRushView: View {
         .presentationDragIndicator(.hidden)
     }
 
-    // ─────────────────────────────────────────────────────────────────────
+  
     // MARK: Logic
-    // ─────────────────────────────────────────────────────────────────────
+   
     func handleAnswerTap(_ answer: String, question: Question) {
         viewModel.selectAnswer(answer)
 
@@ -677,9 +677,7 @@ struct QuizRushView: View {
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────
-// MARK: ShakeEffect
-// ─────────────────────────────────────────────────────────────────────────
+
 struct ShakeEffect: GeometryEffect {
     var animatableData: CGFloat
 
