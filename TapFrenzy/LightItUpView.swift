@@ -3,17 +3,17 @@ import Combine
 
 struct Level {
     let cardCount: Int
-    let litWindow: Double   // seconds the card stays lit
+    let litWindow: Double
     let litCount: Int
     let color: Color
     let name: String
-    let scoreThreshold: Int  // minimum score to reach this level
+    let scoreThreshold: Int
 }
 
 struct Card: Identifiable {
     let id: Int
     var isLit: Bool = false
-    var wasTapped: Bool = false  // prevents double-tap scoring
+    var wasTapped: Bool = false
 }
 
 struct LightItUpView: View {
@@ -32,7 +32,7 @@ struct LightItUpView: View {
     @State private var showLevelUp = false
     @State private var playerName = ""
     @State private var showNameSheet = false
-    @State private var lostLifeFlash = false   // brief  flash on life lost
+    @State private var lostLifeFlash = false
 
     
     @State private var generation = 0
@@ -55,11 +55,11 @@ struct LightItUpView: View {
     }
 
   
-    // MARK: Body
-    // ─────────────────────────────────────────────────────────────────────
+    // marks: Body
+    
     var body: some View {
         ZStack {
-            // Background — flashes red briefly when a life is lost
+            
             (lostLifeFlash ? Color.red.opacity(0.25) : Color.black)
                 .ignoresSafeArea()
                 .animation(.easeOut(duration: 0.25), value: lostLifeFlash)
@@ -148,9 +148,9 @@ struct LightItUpView: View {
         }
     }
 
-    // ─────────────────────────────────────────────────────────────────────
-    // MARK: Start screen
-    // ─────────────────────────────────────────────────────────────────────
+  
+    // marks : Start screen
+
     var startScreen: some View {
         VStack(spacing: 30) {
             Text("LIGHT IT UP")
@@ -225,15 +225,15 @@ struct LightItUpView: View {
         }
     }
 
-    // ─────────────────────────────────────────────────────────────────────
-    // MARK: Game screen
-    // ─────────────────────────────────────────────────────────────────────
+   
+    // marks : Game screen
+
     var gameScreen: some View {
         VStack(spacing: 0) {
 
-            // ── HUD ──────────────────────────────────────────────────────
+            // HUD
             HStack {
-                // Score
+              
                 VStack(alignment: .leading, spacing: 2) {
                     Text("SCORE").font(.caption).foregroundColor(.gray)
                     Text("\(score)")
@@ -295,7 +295,7 @@ struct LightItUpView: View {
 
             Spacer()
 
-            // ── Card grid ────────────────────────────────────────────────
+            //  Card grid
             LazyVGrid(columns: columns, spacing: 12) {
                 ForEach(cards) { card in
                     RoundedRectangle(cornerRadius: 14)
@@ -320,9 +320,9 @@ struct LightItUpView: View {
         }
     }
 
-    // ─────────────────────────────────────────────────────────────────────
-    // MARK: Game over screen
-    // ─────────────────────────────────────────────────────────────────────
+
+    // marks : Game over screen
+
     var gameOverScreen: some View {
         VStack(spacing: 24) {
             Text(lives == 0 ? "NO LIVES LEFT!" : "TIME'S UP!")
@@ -380,9 +380,9 @@ struct LightItUpView: View {
         }
     }
 
-    // ─────────────────────────────────────────────────────────────────────
-    // MARK: Game logic
-    // ─────────────────────────────────────────────────────────────────────
+    
+    // marks : Game logic
+   
 
     func startGame() {
         score = 0
@@ -393,7 +393,7 @@ struct LightItUpView: View {
         generation += 1
         cards = (0..<levels[0].cardCount).map { Card(id: $0) }
         gameStarted = true
-        // Short grace period before first card lights up
+       
         scheduleNextLight(after: 0.6)
     }
 
@@ -406,8 +406,6 @@ struct LightItUpView: View {
         showNameSheet = true
     }
 
-    /// Schedules a light-up cycle. After the lit window the card turns off;
-    /// if it was NOT tapped, the player loses a life. Then the next cycle starts.
     func scheduleNextLight(after delay: Double = 0) {
         let capturedGen    = generation
         let capturedWindow = level.litWindow
@@ -416,11 +414,11 @@ struct LightItUpView: View {
             guard self.gameStarted && !self.gameOver else { return }
             guard self.generation == capturedGen else { return }
 
-            // Remember which cards are about to be lit so we can check missed taps
+            
             self.lightUpCards()
             let litCardIds = self.cards.filter { $0.isLit }.map { $0.id }
 
-            // After the window, turn cards off and penalise missed taps
+            
             DispatchQueue.main.asyncAfter(deadline: .now() + capturedWindow) {
                 guard self.generation == capturedGen else { return }
 
@@ -428,7 +426,7 @@ struct LightItUpView: View {
                 for id in litCardIds {
                     if let idx = self.cards.firstIndex(where: { $0.id == id }),
                        self.cards[idx].isLit && !self.cards[idx].wasTapped {
-                        // Card timed out without being tapped — lose a life
+                        
                         self.cards[idx].isLit = false
                         missedAny = true
                     }
@@ -438,7 +436,7 @@ struct LightItUpView: View {
                     self.loseLife()
                 }
 
-                // Only continue if the game is still running
+            
                 guard self.gameStarted && !self.gameOver else { return }
                 guard self.generation == capturedGen else { return }
 
@@ -472,7 +470,7 @@ struct LightItUpView: View {
                 cards[index].isLit = false
             }
             cards[index].wasTapped = true
-            // Check for score-based level progression after every correct tap
+         
             checkLevelUp()
         } else {
             // Wrong tap — lose a life
@@ -480,7 +478,7 @@ struct LightItUpView: View {
         }
     }
 
-    /// Deducts one life and ends the game if lives reach 0.
+ 
     func loseLife() {
         guard lives > 0 else { return }
         lives -= 1
@@ -496,10 +494,9 @@ struct LightItUpView: View {
         }
     }
 
-    /// Level up based on score thresholds. When the level changes, bump
-    /// generation so stale closures are discarded and restart the cycle.
+  
     func checkLevelUp() {
-        // Find the highest level whose threshold the player has met
+       
         var targetLevel = 0
         for (i, lvl) in levels.enumerated() {
             if score >= lvl.scoreThreshold { targetLevel = i }
