@@ -78,9 +78,7 @@ struct QuizRushView: View {
         .task { await viewModel.load() }
     }
 
-    // ─────────────────────────────────────────────────────────────────────
     // MARK: Loading
-    // ─────────────────────────────────────────────────────────────────────
     var loadingView: some View {
         VStack(spacing: 20) {
             ZStack {
@@ -101,9 +99,7 @@ struct QuizRushView: View {
         }
     }
 
-    // ─────────────────────────────────────────────────────────────────────
     // MARK: Failed
-    // ─────────────────────────────────────────────────────────────────────
     var failedView: some View {
         VStack(spacing: 28) {
             ZStack {
