@@ -555,7 +555,7 @@ struct QuizRushView: View {
                             .shadow(color: accentA.opacity(0.4), radius: 12)
                     }
 
-                    NavigationLink(destination: StatsTab(game: "QuizRush")) {
+                    NavigationLink(destination: StatsTab(initialMode: .quizRush)) {
                         HStack(spacing: 8) {
                             Image(systemName: "trophy.fill").foregroundColor(accentD)
                             Text("Leaderboard")

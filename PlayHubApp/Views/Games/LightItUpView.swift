@@ -159,7 +159,7 @@ struct LightItUpView: View {
                     .cornerRadius(14)
             }
 
-            NavigationLink(destination: StatsTab(game: "LightItUp")) {
+            NavigationLink(destination: StatsTab(initialMode: .lightItUp)) {
                 HStack {
                     Image(systemName: "trophy.fill").foregroundColor(.yellow)
                     Text("Leaderboard")

@@ -95,7 +95,7 @@ struct TapFrenzyView: View {
                     .foregroundColor(.black)
                     .cornerRadius(14)
             }
-            NavigationLink(destination: StatsTab(game: "TapFrenzy")) {
+            NavigationLink(destination: StatsTab(initialMode: .tapFrenzy)) {
                 HStack {
                     Image(systemName: "trophy.fill")
                         .foregroundColor(.yellow)
