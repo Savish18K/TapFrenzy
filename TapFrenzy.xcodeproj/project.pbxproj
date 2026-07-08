@@ -11,7 +11,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		EF77F5DB2FD9394B00D55EE7 /* TapFrenzy */ = {
+		EF77F5DB2FD9394B00D55EE7 /* PlayHubApp */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = PlayHubApp;
 			sourceTree = "<group>";
@@ -29,50 +29,10 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		EF2B42552FFE25E900A15C64 /* Models */ = {
-			isa = PBXGroup;
-			children = (
-				EF2B42562FFE26D800A15C64 /* ViewModels */,
-				EF2B42572FFE27B900A15C64 /* Services */,
-			);
-			path = Models;
-			sourceTree = "<group>";
-		};
-		EF2B42562FFE26D800A15C64 /* ViewModels */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = ViewModels;
-			sourceTree = "<group>";
-		};
-		EF2B42572FFE27B900A15C64 /* Services */ = {
-			isa = PBXGroup;
-			children = (
-				EF2B42582FFE27D900A15C64 /* Views */,
-			);
-			path = Services;
-			sourceTree = "<group>";
-		};
-		EF2B42582FFE27D900A15C64 /* Views */ = {
-			isa = PBXGroup;
-			children = (
-				EF2B42592FFE27FE00A15C64 /* Shared */,
-			);
-			path = Views;
-			sourceTree = "<group>";
-		};
-		EF2B42592FFE27FE00A15C64 /* Shared */ = {
-			isa = PBXGroup;
-			children = (
-				EF77F5DB2FD9394B00D55EE7 /* TapFrenzy */,
-			);
-			path = Shared;
-			sourceTree = "<group>";
-		};
 		EF77F5D02FD9394B00D55EE7 = {
 			isa = PBXGroup;
 			children = (
-				EF77F5DB2FD9394B00D55EE7 /* TapFrenzy */,
+				EF77F5DB2FD9394B00D55EE7 /* PlayHubApp */,
 				EF77F5DA2FD9394B00D55EE7 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -101,7 +61,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				EF77F5DB2FD9394B00D55EE7 /* TapFrenzy */,
+				EF77F5DB2FD9394B00D55EE7 /* PlayHubApp */,
 			);
 			name = TapFrenzy;
 			packageProductDependencies = (
@@ -295,6 +255,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We need your location to show where you achieved your high scores on the map.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -330,6 +291,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We need your location to show where you achieved your high scores on the map.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

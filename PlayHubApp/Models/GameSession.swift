@@ -1,37 +1,63 @@
 import Foundation
+import Combine
 
 struct GameSession: Codable, Identifiable {
     var id: UUID = UUID()
-    let playerName: String
+    let mode: GameMode
     let score: Int
-    let date: Date
+    let timestamp: Date
+    let latitude: Double
+    let longitude: Double
 }
 
-class GameSessionManager {
-    static let shared = GameSessionManager()
-    private init() {}
+class SessionStore: ObservableObject {
+    static let shared = SessionStore()
     
-    func loadScores(for game: String) -> [GameSession] {
-        guard let data = UserDefaults.standard.data(forKey: "scores_\(game)") else {
-            return []
-        }
-        return (try? JSONDecoder().decode([GameSession].self, from: data)) ?? []
+    @Published var sessions: [GameSession] = []
+    
+    private let sessionsKey = "saved_sessions"
+    
+    private init() {
+        load()
     }
     
-    func saveScore(playerName: String, score: Int, game: String) {
-        var scores = loadScores(for: game)
-        let entry = GameSession(
-            playerName: playerName.isEmpty ? "Anonymous" : playerName,
-            score: score,
-            date: Date()
-        )
-        scores.append(entry)
-        scores.sort { $0.score > $1.score }
-        if scores.count > 20 {
-            scores = Array(scores.prefix(20))
+    func save(mode: GameMode, score: Int, lat: Double, lon: Double) {
+        let session = GameSession(mode: mode, score: score, timestamp: Date(), latitude: lat, longitude: lon)
+        sessions.append(session)
+        persist()
+    }
+    
+    func clearAll() {
+        sessions.removeAll()
+        persist()
+    }
+    
+    func bestScore(for mode: GameMode) -> Int {
+        sessions.filter { $0.mode == mode }.map { $0.score }.max() ?? 0
+    }
+    
+    func totalGames(for mode: GameMode) -> Int {
+        sessions.filter { $0.mode == mode }.count
+    }
+    
+    var overallBestScore: Int {
+        sessions.map { $0.score }.max() ?? 0
+    }
+    
+    var totalGamesPlayed: Int {
+        sessions.count
+    }
+    
+    private func persist() {
+        if let encoded = try? JSONEncoder().encode(sessions) {
+            UserDefaults.standard.set(encoded, forKey: sessionsKey)
         }
-        if let encoded = try? JSONEncoder().encode(scores) {
-            UserDefaults.standard.set(encoded, forKey: "scores_\(game)")
+    }
+    
+    private func load() {
+        if let data = UserDefaults.standard.data(forKey: sessionsKey),
+           let decoded = try? JSONDecoder().decode([GameSession].self, from: data) {
+            self.sessions = decoded
         }
     }
 }

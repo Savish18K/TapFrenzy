@@ -1,5 +1,6 @@
 import SwiftUI
 import Combine
+import CoreLocation
 
 struct TapFrenzyView: View {
     
@@ -80,11 +81,6 @@ struct TapFrenzyView: View {
                     .textFieldStyle(.roundedBorder)
                     .padding(.horizontal, 30)
                 Button {
-                    GameSessionManager.shared.saveScore(
-                        playerName: playerName,
-                        score: score,
-                        game: "TapFrenzy"
-                    )
                     playerName = ""
                     showNameSheet = false
                 } label: {
@@ -299,6 +295,16 @@ struct TapFrenzyView: View {
                     .foregroundColor(.gray)
             }
             
+            ShareLink(item: "I just scored \(score) on Tap Frenzy — beat that! 👆") {
+                Text("SHARE SCORE")
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 30)
+                    .padding(.vertical, 12)
+                    .background(Color.blue)
+                    .cornerRadius(12)
+            }
+            
             Button {
                 startGame()
             } label: {
@@ -366,6 +372,10 @@ struct TapFrenzyView: View {
         if score > highScore {
             highScore = score
         }
+        
+        let lat = LocationService.shared.lastLocation?.coordinate.latitude ?? 0.0
+        let lon = LocationService.shared.lastLocation?.coordinate.longitude ?? 0.0
+        SessionStore.shared.save(mode: .tapFrenzy, score: score, lat: lat, lon: lon)
 
         showNameSheet = true
     }

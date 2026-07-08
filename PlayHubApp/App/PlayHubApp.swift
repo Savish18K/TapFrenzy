@@ -1,17 +1,20 @@
 //
-//  TapFrenzyApp.swift
-//  TapFrenzy
-//
-//  Created by Savishka76 on 2026-06-10.
+//  PlayHubApp.swift
+//  PlayHubApp
 //
 
 import SwiftUI
 
 @main
 struct PlayHubApp: App {
+    init() {
+        NotificationService.shared.requestPermission()
+        _ = LocationService.shared
+    }
+    
     var body: some Scene {
         WindowGroup {
-            HomeTab()
+            MainTabView()
         }
     }
 }

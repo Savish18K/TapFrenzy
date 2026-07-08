@@ -1,4 +1,5 @@
 import SwiftUI
+import CoreLocation
 
 // Per-option vivid colours used consistently throughout the quiz
 private let optionColors: [Color] = [
@@ -519,6 +520,20 @@ struct QuizRushView: View {
 
                 // Buttons
                 VStack(spacing: 12) {
+                    ShareLink(item: "I just scored \(viewModel.score) on Quiz Rush — beat that! 🧠") {
+                        Text("SHARE SCORE")
+                            .font(.system(size: 17, weight: .black))
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 17)
+                            .background(
+                                LinearGradient(colors: [accentC, accentA],
+                                               startPoint: .leading, endPoint: .trailing)
+                            )
+                            .clipShape(RoundedRectangle(cornerRadius: 16))
+                            .shadow(color: accentC.opacity(0.4), radius: 12)
+                    }
+                    
                     Button {
                         showResults = false
                         Task { await viewModel.load() }
@@ -619,11 +634,6 @@ struct QuizRushView: View {
                     .padding(.horizontal, 24)
 
                 Button {
-                    GameSessionManager.shared.saveScore(
-                        playerName: playerName.isEmpty ? "Anonymous" : playerName,
-                        score: viewModel.score,
-                        game: "QuizRush"
-                    )
                     playerName = ""
                     showNameSheet = false
                     showResults = true
@@ -669,6 +679,11 @@ struct QuizRushView: View {
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
             if viewModel.isLastQuestion {
                 if viewModel.score > highScore { highScore = viewModel.score }
+                
+                let lat = LocationService.shared.lastLocation?.coordinate.latitude ?? 0.0
+                let lon = LocationService.shared.lastLocation?.coordinate.longitude ?? 0.0
+                SessionStore.shared.save(mode: .quizRush, score: viewModel.score, lat: lat, lon: lon)
+                
                 showNameSheet = true
             } else {
                 viewModel.nextQuestion()

@@ -1,5 +1,6 @@
 import SwiftUI
 import Combine
+import CoreLocation
 
 struct Level {
     let cardCount: Int
@@ -116,11 +117,6 @@ struct LightItUpView: View {
                         .textFieldStyle(.roundedBorder)
                         .padding(.horizontal, 30)
                     Button {
-                        GameSessionManager.shared.saveScore(
-                            playerName: playerName,
-                            score: score,
-                            game: "LightItUp"
-                        )
                         playerName = ""
                         showNameSheet = false
                     } label: {
@@ -349,7 +345,17 @@ struct LightItUpView: View {
             } else {
                 Text("Best: \(highScore)").foregroundColor(.gray)
             }
-
+            
+            ShareLink(item: "I just scored \(score) on Light It Up — beat that! 💡") {
+                Text("SHARE SCORE")
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 30)
+                    .padding(.vertical, 12)
+                    .background(Color.blue)
+                    .cornerRadius(12)
+            }
+            
             Button { startGame() } label: {
                 Text("PLAY AGAIN")
                     .font(.system(size: 20, weight: .bold))
@@ -403,6 +409,11 @@ struct LightItUpView: View {
         gameOver = true
         for i in cards.indices { cards[i].isLit = false }
         if score > highScore { highScore = score }
+        
+        let lat = LocationService.shared.lastLocation?.coordinate.latitude ?? 0.0
+        let lon = LocationService.shared.lastLocation?.coordinate.longitude ?? 0.0
+        SessionStore.shared.save(mode: .lightItUp, score: score, lat: lat, lon: lon)
+        
         showNameSheet = true
     }
 
