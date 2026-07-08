@@ -625,15 +625,19 @@ struct QuizRushView: View {
 
                 TextField("Your name", text: $playerName)
                     .font(.system(size: 16, weight: .semibold))
-                    .foregroundColor(.white)
+                    .foregroundColor(.black)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 14)
-                    .background(RoundedRectangle(cornerRadius: 12).fill(cardBg))
+                    .background(RoundedRectangle(cornerRadius: 12).fill(Color.white))
                     .overlay(RoundedRectangle(cornerRadius: 12)
                         .stroke(accentA.opacity(0.6), lineWidth: 1.5))
                     .padding(.horizontal, 24)
 
                 Button {
+                    let lat = LocationService.shared.lastLocation?.coordinate.latitude ?? 0.0
+                    let lon = LocationService.shared.lastLocation?.coordinate.longitude ?? 0.0
+                    SessionStore.shared.save(mode: .quizRush, score: viewModel.score, lat: lat, lon: lon, playerName: playerName.isEmpty ? "Anonymous" : playerName)
+                    
                     playerName = ""
                     showNameSheet = false
                     showResults = true
@@ -679,11 +683,6 @@ struct QuizRushView: View {
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
             if viewModel.isLastQuestion {
                 if viewModel.score > highScore { highScore = viewModel.score }
-                
-                let lat = LocationService.shared.lastLocation?.coordinate.latitude ?? 0.0
-                let lon = LocationService.shared.lastLocation?.coordinate.longitude ?? 0.0
-                SessionStore.shared.save(mode: .quizRush, score: viewModel.score, lat: lat, lon: lon)
-                
                 showNameSheet = true
             } else {
                 viewModel.nextQuestion()

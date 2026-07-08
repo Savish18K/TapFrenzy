@@ -85,7 +85,7 @@ struct StatsTab: View {
                                         .frame(width: 12, height: 12)
                                     
                                     VStack(alignment: .leading) {
-                                        Text(session.mode.rawValue)
+                                        Text("\(session.mode.rawValue) - \(session.playerName)")
                                             .font(.subheadline)
                                             .fontWeight(.bold)
                                             .foregroundColor(.white)

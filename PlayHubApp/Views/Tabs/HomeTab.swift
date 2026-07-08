@@ -7,7 +7,7 @@ struct HomeTab: View {
             ZStack {
                 Color.black.ignoresSafeArea()
                 
-                VStack(spacing: 40) {
+                VStack(spacing: 20) {
                     
                     VStack(spacing: 8) {
                         HStack(spacing: 0) {
@@ -52,7 +52,7 @@ struct HomeTab: View {
                                 .multilineTextAlignment(.center)
                         }
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 30)
+                        .padding(.vertical, 15)
                         .background(Color.green.opacity(0.2))
                         .cornerRadius(16)
                         .overlay(
@@ -76,7 +76,7 @@ struct HomeTab: View {
                                 .multilineTextAlignment(.center)
                         }
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 30)
+                        .padding(.vertical, 15)
                         .background(Color.blue.opacity(0.2))
                         .cornerRadius(16)
                         .overlay(
@@ -100,7 +100,7 @@ struct HomeTab: View {
                                 .multilineTextAlignment(.center)
                         }
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 30)
+                        .padding(.vertical, 15)
                         .background(Color.orange.opacity(0.2))
                         .cornerRadius(16)
                         .overlay(

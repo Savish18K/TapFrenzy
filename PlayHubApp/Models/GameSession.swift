@@ -8,6 +8,32 @@ struct GameSession: Codable, Identifiable {
     let timestamp: Date
     let latitude: Double
     let longitude: Double
+    var playerName: String = "Anonymous"
+    
+    enum CodingKeys: String, CodingKey {
+        case id, mode, score, timestamp, latitude, longitude, playerName
+    }
+    
+    init(id: UUID = UUID(), mode: GameMode, score: Int, timestamp: Date, latitude: Double, longitude: Double, playerName: String) {
+        self.id = id
+        self.mode = mode
+        self.score = score
+        self.timestamp = timestamp
+        self.latitude = latitude
+        self.longitude = longitude
+        self.playerName = playerName
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.id = try container.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
+        self.mode = try container.decode(GameMode.self, forKey: .mode)
+        self.score = try container.decode(Int.self, forKey: .score)
+        self.timestamp = try container.decode(Date.self, forKey: .timestamp)
+        self.latitude = try container.decode(Double.self, forKey: .latitude)
+        self.longitude = try container.decode(Double.self, forKey: .longitude)
+        self.playerName = try container.decodeIfPresent(String.self, forKey: .playerName) ?? "Anonymous"
+    }
 }
 
 class SessionStore: ObservableObject {
@@ -21,8 +47,8 @@ class SessionStore: ObservableObject {
         load()
     }
     
-    func save(mode: GameMode, score: Int, lat: Double, lon: Double) {
-        let session = GameSession(mode: mode, score: score, timestamp: Date(), latitude: lat, longitude: lon)
+    func save(mode: GameMode, score: Int, lat: Double, lon: Double, playerName: String) {
+        let session = GameSession(mode: mode, score: score, timestamp: Date(), latitude: lat, longitude: lon, playerName: playerName)
         sessions.append(session)
         persist()
     }

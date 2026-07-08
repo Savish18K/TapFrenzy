@@ -115,8 +115,15 @@ struct LightItUpView: View {
                         .foregroundColor(.gray)
                     TextField("Your name", text: $playerName)
                         .textFieldStyle(.roundedBorder)
+                        .foregroundColor(.black)
+                        .background(Color.white)
+                        .cornerRadius(5)
                         .padding(.horizontal, 30)
                     Button {
+                        let lat = LocationService.shared.lastLocation?.coordinate.latitude ?? 0.0
+                        let lon = LocationService.shared.lastLocation?.coordinate.longitude ?? 0.0
+                        SessionStore.shared.save(mode: .lightItUp, score: score, lat: lat, lon: lon, playerName: playerName.isEmpty ? "Anonymous" : playerName)
+                        
                         playerName = ""
                         showNameSheet = false
                     } label: {
@@ -409,10 +416,6 @@ struct LightItUpView: View {
         gameOver = true
         for i in cards.indices { cards[i].isLit = false }
         if score > highScore { highScore = score }
-        
-        let lat = LocationService.shared.lastLocation?.coordinate.latitude ?? 0.0
-        let lon = LocationService.shared.lastLocation?.coordinate.longitude ?? 0.0
-        SessionStore.shared.save(mode: .lightItUp, score: score, lat: lat, lon: lon)
         
         showNameSheet = true
     }
