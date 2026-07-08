@@ -3,17 +3,17 @@ import Combine
 
 struct Level {
     let cardCount: Int
-    let litWindow: Double   
+    let litWindow: Double
     let litCount: Int
     let color: Color
     let name: String
-    let scoreThreshold: Int  
+    let scoreThreshold: Int
 }
 
 struct Card: Identifiable {
     let id: Int
     var isLit: Bool = false
-    var wasTapped: Bool = false  
+    var wasTapped: Bool = false
 }
 
 struct LightItUpView: View {
@@ -32,12 +32,12 @@ struct LightItUpView: View {
     @State private var showLevelUp = false
     @State private var playerName = ""
     @State private var showNameSheet = false
-    @State private var lostLifeFlash = false  
+    @State private var lostLifeFlash = false
 
-   
+    
     @State private var generation = 0
 
-    // 1-second countdown timer
+
     let roundTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     // Score thresholds: L1=0, L2=30, L3=70, L4=120
@@ -54,8 +54,9 @@ struct LightItUpView: View {
         Array(repeating: GridItem(.flexible(), spacing: 12), count: 3)
     }
 
-    
+  
     // marks: Body
+    
     var body: some View {
         ZStack {
             
@@ -115,7 +116,7 @@ struct LightItUpView: View {
                         .textFieldStyle(.roundedBorder)
                         .padding(.horizontal, 30)
                     Button {
-                        LeaderboardManager.shared.saveScore(
+                        GameSessionManager.shared.saveScore(
                             playerName: playerName,
                             score: score,
                             game: "LightItUp"
@@ -147,9 +148,9 @@ struct LightItUpView: View {
         }
     }
 
-
-    // marks: Start screen
   
+    // marks : Start screen
+
     var startScreen: some View {
         VStack(spacing: 30) {
             Text("LIGHT IT UP")
@@ -196,7 +197,7 @@ struct LightItUpView: View {
                     .cornerRadius(14)
             }
 
-            NavigationLink(destination: LeaderboardView(game: "LightItUp")) {
+            NavigationLink(destination: StatsTab(game: "LightItUp")) {
                 HStack {
                     Image(systemName: "trophy.fill").foregroundColor(.yellow)
                     Text("Leaderboard")
@@ -224,15 +225,15 @@ struct LightItUpView: View {
         }
     }
 
-    
-    // marks: Game screen
    
+    // marks : Game screen
+
     var gameScreen: some View {
         VStack(spacing: 0) {
 
-           
+            // HUD
             HStack {
-                // Score
+              
                 VStack(alignment: .leading, spacing: 2) {
                     Text("SCORE").font(.caption).foregroundColor(.gray)
                     Text("\(score)")
@@ -271,7 +272,7 @@ struct LightItUpView: View {
             .padding(.horizontal, 24)
             .padding(.top, 60)
 
-           
+            // Score-based level progress bar
             GeometryReader { geo in
                 let nextThreshold = currentLevel < levels.count - 1
                     ? levels[currentLevel + 1].scoreThreshold
@@ -294,7 +295,7 @@ struct LightItUpView: View {
 
             Spacer()
 
-            // Card grid
+            //  Card grid
             LazyVGrid(columns: columns, spacing: 12) {
                 ForEach(cards) { card in
                     RoundedRectangle(cornerRadius: 14)
@@ -319,9 +320,9 @@ struct LightItUpView: View {
         }
     }
 
-    
+
     // marks : Game over screen
-   
+
     var gameOverScreen: some View {
         VStack(spacing: 24) {
             Text(lives == 0 ? "NO LIVES LEFT!" : "TIME'S UP!")
@@ -379,9 +380,9 @@ struct LightItUpView: View {
         }
     }
 
-
+    
     // marks : Game logic
-
+   
 
     func startGame() {
         score = 0
@@ -392,7 +393,7 @@ struct LightItUpView: View {
         generation += 1
         cards = (0..<levels[0].cardCount).map { Card(id: $0) }
         gameStarted = true
-        
+       
         scheduleNextLight(after: 0.6)
     }
 
@@ -405,7 +406,6 @@ struct LightItUpView: View {
         showNameSheet = true
     }
 
-
     func scheduleNextLight(after delay: Double = 0) {
         let capturedGen    = generation
         let capturedWindow = level.litWindow
@@ -414,11 +414,11 @@ struct LightItUpView: View {
             guard self.gameStarted && !self.gameOver else { return }
             guard self.generation == capturedGen else { return }
 
-           
+            
             self.lightUpCards()
             let litCardIds = self.cards.filter { $0.isLit }.map { $0.id }
 
-      
+            
             DispatchQueue.main.asyncAfter(deadline: .now() + capturedWindow) {
                 guard self.generation == capturedGen else { return }
 
@@ -426,7 +426,7 @@ struct LightItUpView: View {
                 for id in litCardIds {
                     if let idx = self.cards.firstIndex(where: { $0.id == id }),
                        self.cards[idx].isLit && !self.cards[idx].wasTapped {
-                       
+                        
                         self.cards[idx].isLit = false
                         missedAny = true
                     }
@@ -436,10 +436,11 @@ struct LightItUpView: View {
                     self.loseLife()
                 }
 
+            
                 guard self.gameStarted && !self.gameOver else { return }
                 guard self.generation == capturedGen else { return }
 
-              
+                // 0.3 s gap between rounds
                 self.scheduleNextLight(after: 0.3)
             }
         }
@@ -469,19 +470,20 @@ struct LightItUpView: View {
                 cards[index].isLit = false
             }
             cards[index].wasTapped = true
-       
+         
             checkLevelUp()
         } else {
-           
+            // Wrong tap — lose a life
             loseLife()
         }
     }
 
+ 
     func loseLife() {
         guard lives > 0 else { return }
         lives -= 1
 
-        
+        // Visual flash
         lostLifeFlash = true
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
             self.lostLifeFlash = false
@@ -492,9 +494,9 @@ struct LightItUpView: View {
         }
     }
 
-   
+  
     func checkLevelUp() {
-        // Find the highest level whose threshold the player 
+       
         var targetLevel = 0
         for (i, lvl) in levels.enumerated() {
             if score >= lvl.scoreThreshold { targetLevel = i }
