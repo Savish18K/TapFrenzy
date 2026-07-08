@@ -7,7 +7,7 @@ class LocationService: NSObject, ObservableObject, CLLocationManagerDelegate {
     
     private let manager = CLLocationManager()
     
-    @Published var lastLocation: CLLocation?
+    @Published var lastLocation: CLLocation? = nil
     
     private override init() {
         super.init()
@@ -27,5 +27,8 @@ class LocationService: NSObject, ObservableObject, CLLocationManagerDelegate {
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         print("Location manager failed with error: \(error.localizedDescription)")
+        DispatchQueue.main.async {
+            // No fallback location used to ensure strict device accuracy
+        }
     }
 }

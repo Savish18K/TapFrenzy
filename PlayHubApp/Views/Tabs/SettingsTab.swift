@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct SettingsTab: View {
+    @AppStorage("globalPlayerName") private var globalPlayerName = "Anonymous"
     @AppStorage("dailyNotificationsEnabled") private var notificationsEnabled = false
     @State private var notificationTime = Calendar.current.date(bySettingHour: 10, minute: 0, second: 0, of: Date()) ?? Date()
     @State private var showResetConfirmation = false
@@ -15,14 +16,31 @@ struct SettingsTab: View {
                     .foregroundColor(.white)
                     .padding(.top, 20)
                 
+                // Profile Section
+                VStack(spacing: 0) {
+                    HStack {
+                        Text("Player Name")
+                            .foregroundColor(.white)
+                        Spacer()
+                        TextField("Name", text: $globalPlayerName)
+                            .multilineTextAlignment(.trailing)
+                            .foregroundColor(.purple)
+                            .colorScheme(.dark)
+                    }
+                    .padding()
+                }
+                .background(Color.white.opacity(0.05))
+                .cornerRadius(16)
+                .padding(.horizontal)
+                
                 // Notifications Section
                 VStack(spacing: 0) {
                     Toggle("Daily Reminder", isOn: $notificationsEnabled)
                         .padding()
                         .foregroundColor(.white)
                         .tint(.purple)
-                        .onChange(of: notificationsEnabled) { newValue in
-                            if newValue {
+                        .onChange(of: notificationsEnabled) {
+                            if notificationsEnabled {
                                 NotificationService.shared.requestPermission()
                                 scheduleNotification()
                             } else {
@@ -37,7 +55,7 @@ struct SettingsTab: View {
                             .padding()
                             .foregroundColor(.white)
                             .colorScheme(.dark)
-                            .onChange(of: notificationTime) { _ in
+                            .onChange(of: notificationTime) {
                                 scheduleNotification()
                             }
                     }

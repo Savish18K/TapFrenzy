@@ -31,8 +31,7 @@ struct LightItUpView: View {
     @State private var gameOver = false
     @State private var currentLevel = 0
     @State private var showLevelUp = false
-    @State private var playerName = ""
-    @State private var showNameSheet = false
+    @AppStorage("globalPlayerName") private var globalPlayerName = "Anonymous"
     @State private var lostLifeFlash = false
 
     
@@ -100,46 +99,6 @@ struct LightItUpView: View {
                     .background(Circle().fill(Color.white.opacity(0.2)))
             }
             .padding(.leading, 16)
-        }
-        .sheet(isPresented: $showNameSheet) {
-            ZStack {
-                Color.black.ignoresSafeArea()
-                VStack(spacing: 20) {
-                    Text(lives == 0 ? "No Lives Left!" : "Time's Up!")
-                        .font(.system(size: 26, weight: .black))
-                        .foregroundColor(.blue)
-                    Text("Your Score: \(score)")
-                        .font(.system(size: 36, weight: .black))
-                        .foregroundColor(.white)
-                    Text("Enter your name to save")
-                        .foregroundColor(.gray)
-                    TextField("Your name", text: $playerName)
-                        .textFieldStyle(.roundedBorder)
-                        .foregroundColor(.black)
-                        .background(Color.white)
-                        .cornerRadius(5)
-                        .padding(.horizontal, 30)
-                    Button {
-                        let lat = LocationService.shared.lastLocation?.coordinate.latitude ?? 0.0
-                        let lon = LocationService.shared.lastLocation?.coordinate.longitude ?? 0.0
-                        SessionStore.shared.save(mode: .lightItUp, score: score, lat: lat, lon: lon, playerName: playerName.isEmpty ? "Anonymous" : playerName)
-                        
-                        playerName = ""
-                        showNameSheet = false
-                    } label: {
-                        Text("SAVE & CONTINUE")
-                            .font(.system(size: 17, weight: .bold))
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 14)
-                            .background(Color.blue)
-                            .foregroundColor(.white)
-                            .cornerRadius(12)
-                            .padding(.horizontal, 30)
-                    }
-                }
-                .padding()
-            }
-            .presentationDetents([.medium])
         }
         .onReceive(roundTimer) { _ in
             guard gameStarted && !gameOver else { return }
@@ -417,7 +376,9 @@ struct LightItUpView: View {
         for i in cards.indices { cards[i].isLit = false }
         if score > highScore { highScore = score }
         
-        showNameSheet = true
+        let lat = LocationService.shared.lastLocation?.coordinate.latitude ?? 0.0
+        let lon = LocationService.shared.lastLocation?.coordinate.longitude ?? 0.0
+        SessionStore.shared.save(mode: .lightItUp, score: score, lat: lat, lon: lon, playerName: globalPlayerName)
     }
 
     func scheduleNextLight(after delay: Double = 0) {

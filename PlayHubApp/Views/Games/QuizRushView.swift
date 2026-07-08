@@ -17,11 +17,10 @@ struct QuizRushView: View {
 
     @State private var showResults   = false
     @State private var shakeAmount: CGFloat = 0
-    @State private var playerName    = ""
-    @State private var showNameSheet = false
+    @AppStorage("globalPlayerName") private var globalPlayerName = "Anonymous"
     @State private var cardScale: CGFloat = 1.0
 
-    // ── Palette ───────────────────────────────────────────────────────────
+    // ── Palette
     let accentA = optionColors[0]
     let accentB = optionColors[1]
     let accentC = optionColors[2]
@@ -31,7 +30,7 @@ struct QuizRushView: View {
 
     var body: some View {
         ZStack {
-            // ── Background ────────────────────────────────────────────────
+            // ── Background
             bgBase.ignoresSafeArea()
 
             // Vivid ambient blobs
@@ -53,7 +52,7 @@ struct QuizRushView: View {
                 .blur(radius: 80)
                 .offset(x: -60, y: 300)
 
-            // ── Content ───────────────────────────────────────────────────
+            // ── Content
             switch viewModel.state {
             case .loading: loadingView
             case .failed:  failedView
@@ -75,11 +74,16 @@ struct QuizRushView: View {
             .padding(.leading, 16)
             .padding(.top, 8)
         }
-        .sheet(isPresented: $showNameSheet) { nameSheet }
-        .task { await viewModel.load() }
+        .onAppear {
+            Task {
+                if viewModel.questions.isEmpty {
+                    await viewModel.load()
+                }
+            }
+        }
     }
 
-    // MARK: Loading
+    // mark: Loading
     var loadingView: some View {
         VStack(spacing: 20) {
             ZStack {
@@ -100,7 +104,7 @@ struct QuizRushView: View {
         }
     }
 
-    // MARK: Failed
+    // mark: Failed
     var failedView: some View {
         VStack(spacing: 28) {
             ZStack {
@@ -143,13 +147,13 @@ struct QuizRushView: View {
         }
     }
 
-    // ─────────────────────────────────────────────────────────────────────
-    // MARK: Quiz
-    // ─────────────────────────────────────────────────────────────────────
+    
+    // mark : Quiz
+
     var quizView: some View {
         VStack(spacing: 0) {
 
-            // ── Header ────────────────────────────────────────────────────
+            // Header
             HStack(alignment: .center) {
 
                 // Score pill
@@ -210,7 +214,7 @@ struct QuizRushView: View {
             .padding(.horizontal, 20)
             .padding(.top, 64)
 
-            // ── Progress bar ──────────────────────────────────────────────
+            // Progress bar
             GeometryReader { geo in
                 ZStack(alignment: .leading) {
                     RoundedRectangle(cornerRadius: 4)
@@ -240,7 +244,7 @@ struct QuizRushView: View {
 
             if let question = viewModel.currentQuestion {
 
-                // ── Feedback banner ───────────────────────────────────────
+                // Feedback banner
                 if let correct = viewModel.isCorrect {
                     HStack(spacing: 8) {
                         Image(systemName: correct ? "checkmark.circle.fill" : "xmark.circle.fill")
@@ -262,7 +266,7 @@ struct QuizRushView: View {
                     .transition(.scale.combined(with: .opacity))
                 }
 
-                // ── Question card ─────────────────────────────────────────
+                // Question card
                 VStack(spacing: 0) {
                     // colourful top accent strip
                     LinearGradient(
@@ -302,7 +306,7 @@ struct QuizRushView: View {
 
                 Spacer().frame(height: 20)
 
-                // ── Answer grid (2 × 2) ───────────────────────────────────
+                // Answer grid (2 × 2)
                 let answers = question.shuffledAnswers
                 VStack(spacing: 12) {
                     HStack(spacing: 12) {
@@ -330,7 +334,7 @@ struct QuizRushView: View {
         .animation(.easeInOut(duration: 0.3), value: viewModel.isCorrect)
     }
 
-    // ── Answer button ─────────────────────────────────────────────────────
+    // Answer button
     func answerButton(_ answer: String, question: Question, index: Int) -> some View {
         let color           = optionColors[index % optionColors.count]
         let isSelected      = viewModel.selectedAnswer == answer
@@ -432,9 +436,9 @@ struct QuizRushView: View {
         .animation(.spring(response: 0.28, dampingFraction: 0.6), value: isSelected)
     }
 
-    // ─────────────────────────────────────────────────────────────────────
-    // MARK: Results
-    // ─────────────────────────────────────────────────────────────────────
+   
+    // mark : Results
+   
     var resultsView: some View {
         ScrollView(showsIndicators: false) {
             VStack(spacing: 28) {
@@ -579,91 +583,8 @@ struct QuizRushView: View {
         }
     }
 
-   
-    // MARK: Name sheet
-    
-    var nameSheet: some View {
-        ZStack {
-            bgBase.ignoresSafeArea()
-
-            // Decorative blobs
-            Circle()
-                .fill(accentA.opacity(0.18))
-                .frame(width: 220)
-                .blur(radius: 60)
-                .offset(x: -80, y: -100)
-
-            Circle()
-                .fill(accentB.opacity(0.18))
-                .frame(width: 180)
-                .blur(radius: 60)
-                .offset(x: 80, y: 60)
-
-            VStack(spacing: 20) {
-                Capsule()
-                    .fill(Color.white.opacity(0.2))
-                    .frame(width: 36, height: 4)
-                    .padding(.top, 14)
-
-                Text("Quiz Complete!")
-                    .font(.system(size: 24, weight: .black))
-                    .foregroundStyle(
-                        LinearGradient(colors: [accentA, accentB],
-                                       startPoint: .leading, endPoint: .trailing)
-                    )
-
-                Text("\(viewModel.score) pts")
-                    .font(.system(size: 46, weight: .black))
-                    .foregroundStyle(
-                        LinearGradient(colors: [accentC, accentA],
-                                       startPoint: .leading, endPoint: .trailing)
-                    )
-
-                Text("Enter your name to save your score")
-                    .font(.subheadline)
-                    .foregroundColor(.gray)
-
-                TextField("Your name", text: $playerName)
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundColor(.black)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 14)
-                    .background(RoundedRectangle(cornerRadius: 12).fill(Color.white))
-                    .overlay(RoundedRectangle(cornerRadius: 12)
-                        .stroke(accentA.opacity(0.6), lineWidth: 1.5))
-                    .padding(.horizontal, 24)
-
-                Button {
-                    let lat = LocationService.shared.lastLocation?.coordinate.latitude ?? 0.0
-                    let lon = LocationService.shared.lastLocation?.coordinate.longitude ?? 0.0
-                    SessionStore.shared.save(mode: .quizRush, score: viewModel.score, lat: lat, lon: lon, playerName: playerName.isEmpty ? "Anonymous" : playerName)
-                    
-                    playerName = ""
-                    showNameSheet = false
-                    showResults = true
-                } label: {
-                    Text("SAVE & SEE RESULTS")
-                        .font(.system(size: 17, weight: .bold))
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 16)
-                        .background(
-                            LinearGradient(colors: [accentA, accentB],
-                                           startPoint: .leading, endPoint: .trailing)
-                        )
-                        .clipShape(RoundedRectangle(cornerRadius: 14))
-                        .shadow(color: accentA.opacity(0.45), radius: 10)
-                        .padding(.horizontal, 24)
-                }
-            }
-            .padding(.bottom, 30)
-        }
-        .presentationDetents([.medium])
-        .presentationDragIndicator(.hidden)
-    }
-
   
-    // MARK: Logic
+    // mark : Logic
    
     func handleAnswerTap(_ answer: String, question: Question) {
         viewModel.selectAnswer(answer)
@@ -683,7 +604,10 @@ struct QuizRushView: View {
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
             if viewModel.isLastQuestion {
                 if viewModel.score > highScore { highScore = viewModel.score }
-                showNameSheet = true
+                let lat = LocationService.shared.lastLocation?.coordinate.latitude ?? 0.0
+                let lon = LocationService.shared.lastLocation?.coordinate.longitude ?? 0.0
+                SessionStore.shared.save(mode: .quizRush, score: viewModel.score, lat: lat, lon: lon, playerName: globalPlayerName)
+                showResults = true
             } else {
                 viewModel.nextQuestion()
             }

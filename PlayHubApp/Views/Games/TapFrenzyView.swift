@@ -27,8 +27,7 @@ struct TapFrenzyView: View {
     @State private var bonusUsed = false
     
     @State private var tapScale = CGFloat(1.0)
-    @State private var playerName = ""
-    @State private var showNameSheet = false
+    @AppStorage("globalPlayerName") private var globalPlayerName = "Anonymous"
     
     let gameTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     let colorTimer = Timer.publish(every: 2, on: .main, in: .common).autoconnect()
@@ -65,46 +64,6 @@ struct TapFrenzyView: View {
             }
             .padding(.leading, 16)
         }
-        .sheet(isPresented: $showNameSheet) {
-        ZStack {
-            Color.black.ignoresSafeArea()
-            VStack(spacing: 20) {
-                Text("Game Over!")
-                    .font(.system(size: 26, weight: .black))
-                    .foregroundColor(.green)
-                Text("Your Score: \(score)")
-                    .font(.system(size: 36, weight: .black))
-                    .foregroundColor(.white)
-                Text("Enter your name to save")
-                    .foregroundColor(.gray)
-                TextField("Your name", text: $playerName)
-                    .textFieldStyle(.roundedBorder)
-                    .foregroundColor(.black)
-                    .background(Color.white)
-                    .cornerRadius(5)
-                    .padding(.horizontal, 30)
-                Button {
-                    let lat = LocationService.shared.lastLocation?.coordinate.latitude ?? 0.0
-                    let lon = LocationService.shared.lastLocation?.coordinate.longitude ?? 0.0
-                    SessionStore.shared.save(mode: .tapFrenzy, score: score, lat: lat, lon: lon, playerName: playerName.isEmpty ? "Anonymous" : playerName)
-                    
-                    playerName = ""
-                    showNameSheet = false
-                } label: {
-                    Text("SAVE & CONTINUE")
-                        .font(.system(size: 17, weight: .bold))
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 14)
-                        .background(Color.green)
-                        .foregroundColor(.black)
-                        .cornerRadius(12)
-                        .padding(.horizontal, 30)
-                }
-            }
-            .padding()
-        }
-        .presentationDetents([.medium])
-    }
     }
     
     var startScreen: some View {
@@ -380,7 +339,9 @@ struct TapFrenzyView: View {
             highScore = score
         }
         
-        showNameSheet = true
+        let lat = LocationService.shared.lastLocation?.coordinate.latitude ?? 0.0
+        let lon = LocationService.shared.lastLocation?.coordinate.longitude ?? 0.0
+        SessionStore.shared.save(mode: .tapFrenzy, score: score, lat: lat, lon: lon, playerName: globalPlayerName)
     }
     
     func handleTap() {

@@ -48,7 +48,11 @@ class SessionStore: ObservableObject {
     }
     
     func save(mode: GameMode, score: Int, lat: Double, lon: Double, playerName: String) {
-        let session = GameSession(mode: mode, score: score, timestamp: Date(), latitude: lat, longitude: lon, playerName: playerName)
+        // Add a tiny random jitter (approx ~50 meters) so pins from the same location fan out
+        let jLat = lat + Double.random(in: -0.0005...0.0005)
+        let jLon = lon + Double.random(in: -0.0005...0.0005)
+        
+        let session = GameSession(mode: mode, score: score, timestamp: Date(), latitude: jLat, longitude: jLon, playerName: playerName)
         sessions.append(session)
         persist()
     }
