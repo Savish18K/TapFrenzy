@@ -1,8 +1,8 @@
 import SwiftUI
 
 struct SettingsTab: View {
-    @AppStorage("globalPlayerName") private var globalPlayerName = "Anonymous"
     @AppStorage("dailyNotificationsEnabled") private var notificationsEnabled = false
+    @AppStorage("notificationGameType") private var notificationGameType = "Random"
     @State private var notificationTime = Calendar.current.date(bySettingHour: 10, minute: 0, second: 0, of: Date()) ?? Date()
     @State private var showResetConfirmation = false
     
@@ -15,23 +15,6 @@ struct SettingsTab: View {
                     .font(.system(size: 32, weight: .black))
                     .foregroundColor(.white)
                     .padding(.top, 20)
-                
-                // Profile Section
-                VStack(spacing: 0) {
-                    HStack {
-                        Text("Player Name")
-                            .foregroundColor(.white)
-                        Spacer()
-                        TextField("Name", text: $globalPlayerName)
-                            .multilineTextAlignment(.trailing)
-                            .foregroundColor(.purple)
-                            .colorScheme(.dark)
-                    }
-                    .padding()
-                }
-                .background(Color.white.opacity(0.05))
-                .cornerRadius(16)
-                .padding(.horizontal)
                 
                 // Notifications Section
                 VStack(spacing: 0) {
@@ -58,6 +41,22 @@ struct SettingsTab: View {
                             .onChange(of: notificationTime) {
                                 scheduleNotification()
                             }
+                            
+                        Divider().background(Color.gray.opacity(0.3))
+                        
+                        Picker("Reminder Type", selection: $notificationGameType) {
+                            Text("Random").tag("Random")
+                            Text("Tap Frenzy").tag("Tap Frenzy")
+                            Text("Light It Up").tag("Light It Up")
+                            Text("Quiz Rush").tag("Quiz Rush")
+                        }
+                        .pickerStyle(.menu)
+                        .padding()
+                        .foregroundColor(.white)
+                        .tint(.purple)
+                        .onChange(of: notificationGameType) {
+                            scheduleNotification()
+                        }
                     }
                 }
                 .background(Color.white.opacity(0.05))
@@ -100,7 +99,7 @@ struct SettingsTab: View {
     private func scheduleNotification() {
         let components = Calendar.current.dateComponents([.hour, .minute], from: notificationTime)
         if let hour = components.hour, let minute = components.minute {
-            NotificationService.shared.scheduleDailyNotification(at: hour, minute: minute)
+            NotificationService.shared.scheduleDailyNotification(at: hour, minute: minute, type: notificationGameType)
         }
     }
 }

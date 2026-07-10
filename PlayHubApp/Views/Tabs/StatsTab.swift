@@ -24,6 +24,13 @@ struct StatsTab: View {
         filteredSessions.suffix(15).map { $0 }
     }
     
+    // Average score of recent games
+    var averageRecentScore: Double {
+        guard !recentScores.isEmpty else { return 0 }
+        let total = recentScores.reduce(0) { $0 + $1.score }
+        return Double(total) / Double(recentScores.count)
+    }
+    
     var body: some View {
         ZStack {
             Color.black.ignoresSafeArea()
@@ -108,20 +115,32 @@ struct StatsTab: View {
                                     .foregroundColor(.gray)
                                 
                                 Chart {
+                                    // Average Line
+                                    RuleMark(
+                                        y: .value("Average", averageRecentScore)
+                                    )
+                                    .lineStyle(StrokeStyle(lineWidth: 1.5, dash: [5, 5]))
+                                    .foregroundStyle(.gray.opacity(0.8))
+                                    .annotation(position: .top, alignment: .leading) {
+                                        Text("AVG: \(Int(averageRecentScore))")
+                                            .font(.system(size: 10, weight: .bold))
+                                            .foregroundColor(.gray)
+                                    }
+                                    
                                     ForEach(Array(recentScores.enumerated()), id: \.element.id) { index, session in
-                                        LineMark(
+                                        // Bar Chart
+                                        BarMark(
                                             x: .value("Game", index + 1),
                                             y: .value("Score", session.score)
                                         )
-                                        .interpolationMethod(.catmullRom)
-                                        .foregroundStyle(selectedMode.color)
-                                        .lineStyle(StrokeStyle(lineWidth: 3))
-                                        
-                                        PointMark(
-                                            x: .value("Game", index + 1),
-                                            y: .value("Score", session.score)
+                                        .foregroundStyle(
+                                            LinearGradient(
+                                                colors: [selectedMode.color.opacity(0.9), selectedMode.color.opacity(0.3)],
+                                                startPoint: .top,
+                                                endPoint: .bottom
+                                            )
                                         )
-                                        .foregroundStyle(selectedMode.color)
+                                        .cornerRadius(4)
                                     }
                                 }
                                 .frame(height: 200)
