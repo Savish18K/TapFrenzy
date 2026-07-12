@@ -40,7 +40,7 @@ struct TapFrenzyView: View {
     
     var body: some View {
         ZStack {
-            Color.black.ignoresSafeArea()
+            AppBackground()
             
             if !gameStarted {
                 startScreen
@@ -261,7 +261,7 @@ struct TapFrenzyView: View {
                     .foregroundColor(.gray)
             }
             
-            ShareLink(item: "I just scored \(score) on Tap Frenzy — beat that! 👆") {
+            ShareLink(item: "I just scored \(score) on Tap Frenzy — beat that! 🔥") {
                 Text("SHARE SCORE")
                     .font(.system(size: 16, weight: .bold))
                     .foregroundColor(.white)

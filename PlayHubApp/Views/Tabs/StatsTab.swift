@@ -33,7 +33,7 @@ struct StatsTab: View {
     
     var body: some View {
         ZStack {
-            Color.black.ignoresSafeArea()
+            AppBackground()
             
             VStack(spacing: 0) {
                 Text("STATISTICS")
@@ -128,32 +128,41 @@ struct StatsTab: View {
                                     }
                                     
                                     ForEach(Array(recentScores.enumerated()), id: \.element.id) { index, session in
-                                        // Bar Chart
                                         BarMark(
-                                            x: .value("Game", index + 1),
-                                            y: .value("Score", session.score)
+                                            x: .value("Game", "G\(index + 1)"),
+                                            y: .value("Score", session.score),
+                                            width: .fixed(22)
                                         )
                                         .foregroundStyle(
                                             LinearGradient(
-                                                colors: [selectedMode.color.opacity(0.9), selectedMode.color.opacity(0.3)],
+                                                colors: [selectedMode.color, selectedMode.color.opacity(0.4)],
                                                 startPoint: .top,
                                                 endPoint: .bottom
                                             )
                                         )
-                                        .cornerRadius(4)
+                                        .cornerRadius(6)
+                                        .annotation(position: .top, spacing: 4) {
+                                            Text("\(session.score)")
+                                                .font(.system(size: 9, weight: .bold))
+                                                .foregroundColor(selectedMode.color)
+                                        }
                                     }
                                 }
-                                .frame(height: 200)
+                                .frame(height: 240)
                                 .chartXAxis {
                                     AxisMarks(values: .automatic) { _ in
-                                        AxisGridLine(stroke: StrokeStyle(lineWidth: 0.5)).foregroundStyle(.gray.opacity(0.3))
-                                        AxisValueLabel().foregroundStyle(.gray)
+                                        AxisGridLine(stroke: StrokeStyle(lineWidth: 0.5)).foregroundStyle(.gray.opacity(0.2))
+                                        AxisValueLabel()
+                                            .foregroundStyle(.gray)
+                                            .font(.system(size: 10, weight: .medium))
                                     }
                                 }
                                 .chartYAxis {
                                     AxisMarks(position: .leading) { _ in
-                                        AxisGridLine(stroke: StrokeStyle(lineWidth: 0.5)).foregroundStyle(.gray.opacity(0.3))
-                                        AxisValueLabel().foregroundStyle(.gray)
+                                        AxisGridLine(stroke: StrokeStyle(lineWidth: 0.5)).foregroundStyle(.gray.opacity(0.2))
+                                        AxisValueLabel()
+                                            .foregroundStyle(.gray)
+                                            .font(.system(size: 10, weight: .medium))
                                     }
                                 }
                             }

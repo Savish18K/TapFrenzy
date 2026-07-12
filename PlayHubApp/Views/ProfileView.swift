@@ -27,7 +27,7 @@ struct ProfileView: View {
     
     var body: some View {
         ZStack {
-            Color.black.ignoresSafeArea()
+            AppBackground()
             
             // Background gradient blobs
             Circle()

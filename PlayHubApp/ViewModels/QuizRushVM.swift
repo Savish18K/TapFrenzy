@@ -18,6 +18,9 @@ class QuizRushVM: ObservableObject {
     @Published var selectedAnswer: String? = nil
     @Published var isCorrect: Bool? = nil
     
+    // Cache shuffled answers so they don't reshuffle on re-render
+    private var shuffledAnswersCache: [String: [String]] = [:]
+    
     private let service = TriviaAPI()
     
     var currentQuestion: Question? {
@@ -39,6 +42,11 @@ class QuizRushVM: ObservableObject {
             await MainActor.run {
                 questions = fetched
                 currentIndex = 0
+                // Pre-shuffle answers for all questions
+                shuffledAnswersCache = [:]
+                for q in fetched {
+                    shuffledAnswersCache[q.id] = q.shuffledAnswers
+                }
                 score = 0
                 streak = 0
                 selectedAnswer = nil
@@ -77,5 +85,11 @@ class QuizRushVM: ObservableObject {
         if currentIndex < questions.count - 1 {
             currentIndex += 1
         }
+    }
+    
+    /// Stable shuffled answers for the current question (won't change on re-render)
+    var currentShuffledAnswers: [String] {
+        guard let q = currentQuestion else { return [] }
+        return shuffledAnswersCache[q.id] ?? q.shuffledAnswers
     }
 }

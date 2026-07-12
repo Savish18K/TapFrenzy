@@ -60,9 +60,13 @@ struct LightItUpView: View {
     var body: some View {
         ZStack {
             
-            (lostLifeFlash ? Color.red.opacity(0.25) : Color.black)
-                .ignoresSafeArea()
-                .animation(.easeOut(duration: 0.25), value: lostLifeFlash)
+            AppBackground()
+            
+            if lostLifeFlash {
+                Color.red.opacity(0.25)
+                    .ignoresSafeArea()
+                    .animation(.easeOut(duration: 0.25), value: lostLifeFlash)
+            }
 
             if !gameStarted {
                 startScreen

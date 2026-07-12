@@ -24,7 +24,7 @@ class NotificationService {
         
         switch type {
         case "Tap Frenzy":
-            content.body = "It's Tap Frenzy time! 👆 Tap as fast as you can to beat your high score!"
+            content.body = "It's Tap Frenzy time! 🔥 Tap as fast as you can to beat your high score!"
         case "Light It Up":
             content.body = "Time to Light It Up! 💡 React fast and beat your high score!"
         case "Quiz Rush":

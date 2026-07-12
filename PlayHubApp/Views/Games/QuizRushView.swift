@@ -31,7 +31,7 @@ struct QuizRushView: View {
     var body: some View {
         ZStack {
             // ── Background
-            bgBase.ignoresSafeArea()
+            AppBackground()
 
             // Vivid ambient blobs
             Circle()
@@ -307,7 +307,7 @@ struct QuizRushView: View {
                 Spacer().frame(height: 20)
 
                 // Answer grid (2 × 2)
-                let answers = question.shuffledAnswers
+                let answers = viewModel.currentShuffledAnswers
                 VStack(spacing: 12) {
                     HStack(spacing: 12) {
                         if answers.count > 0 {

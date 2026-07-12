@@ -16,7 +16,7 @@ struct MapTab: View {
     
     var body: some View {
         ZStack(alignment: .top) {
-            Color.black.ignoresSafeArea()
+            AppBackground()
             
             // Map always shown, even if no valid sessions exist
             Map(position: $position) {

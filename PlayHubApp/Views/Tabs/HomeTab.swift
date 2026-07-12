@@ -37,7 +37,7 @@ struct HomeTab: View {
     
     var body: some View {
         ZStack {
-            Color.black.ignoresSafeArea()
+            AppBackground()
             
             VStack(spacing: 16) {
                 
@@ -46,6 +46,17 @@ struct HomeTab: View {
                     Spacer()
                     
                     VStack(alignment: .center, spacing: 4) {
+                        Image(systemName: "gamecontroller.fill")
+                            .font(.system(size: 40))
+                            .foregroundStyle(
+                                LinearGradient(
+                                    colors: [Color.green, Color.blue, Color.purple],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                            .padding(.bottom, 4)
+                        
                         HStack(spacing: 0) {
                             Text("GAME")
                                 .font(.system(size: 34, weight: .black))
@@ -106,7 +117,7 @@ struct HomeTab: View {
                     }
                 }
                 .padding(.horizontal, 24)
-                .padding(.top, 60)
+                .padding(.top, 10)
                 
                 // Daily Challenge Banner
                 if !isChallengeDismissed {
@@ -172,7 +183,7 @@ struct HomeTab: View {
                 // Tap Frenzy button
                 NavigationLink(destination: TapFrenzyView()) {
                     VStack(spacing: 10) {
-                        Text("👆")
+                        Text("🔥")
                             .font(.system(size: 50))
                         Text("TAP FRENZY")
                             .font(.system(size: 22, weight: .black))

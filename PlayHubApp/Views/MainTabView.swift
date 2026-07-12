@@ -4,7 +4,7 @@ struct MainTabView: View {
     init() {
         let appearance = UITabBarAppearance()
         appearance.configureWithOpaqueBackground()
-        appearance.backgroundColor = UIColor.black
+        appearance.backgroundColor = UIColor(red: 0.06, green: 0.04, blue: 0.15, alpha: 1)
         
         let itemAppearance = UITabBarItemAppearance()
         itemAppearance.normal.iconColor = UIColor.systemGray

@@ -6,13 +6,20 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		43C4EA0E19847B5295EFC96D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 900EBA0A7723628798ADCFDB /* Assets.xcassets */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
+		900EBA0A7723628798ADCFDB /* Assets.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		EF77F5D92FD9394B00D55EE7 /* TapFrenzy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TapFrenzy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		EF77F5DB2FD9394B00D55EE7 /* PlayHubApp */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = PlayHubApp;
 			sourceTree = "<group>";
 		};
@@ -34,6 +41,7 @@
 			children = (
 				EF77F5DB2FD9394B00D55EE7 /* PlayHubApp */,
 				EF77F5DA2FD9394B00D55EE7 /* Products */,
+				900EBA0A7723628798ADCFDB /* Assets.xcassets */,
 			);
 			sourceTree = "<group>";
 		};
@@ -64,8 +72,6 @@
 				EF77F5DB2FD9394B00D55EE7 /* PlayHubApp */,
 			);
 			name = TapFrenzy;
-			packageProductDependencies = (
-			);
 			productName = TapFrenzy;
 			productReference = EF77F5D92FD9394B00D55EE7 /* TapFrenzy.app */;
 			productType = "com.apple.product-type.application";
@@ -109,6 +115,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				43C4EA0E19847B5295EFC96D /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

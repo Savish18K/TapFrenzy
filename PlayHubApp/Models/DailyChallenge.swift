@@ -19,10 +19,10 @@ struct DailyChallenge {
         
         let challenges: [GameMode: [(text: String, emoji: String)]] = [
             .tapFrenzy: [
-                ("Score 30+ in Tap Frenzy!", "👆"),
-                ("Get a 5x combo streak!", "👆"),
-                ("Beat your Tap Frenzy record!", "👆"),
-                ("Score 50+ taps today!", "👆"),
+                ("Score 30+ in Tap Frenzy!", "🔥"),
+                ("Get a 5x combo streak!", "🔥"),
+                ("Beat your Tap Frenzy record!", "🔥"),
+                ("Score 50+ taps today!", "🔥"),
             ],
             .lightItUp: [
                 ("Score 15+ in Light It Up!", "💡"),
