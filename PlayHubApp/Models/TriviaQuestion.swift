@@ -2,6 +2,7 @@ import Foundation
 
 
 struct TriviaResponse: Codable {
+    let response_code: Int
     let results: [Question]
 }
 

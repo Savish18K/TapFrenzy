@@ -6,8 +6,7 @@ struct DailyChallenge {
     let challengeText: String
     let emoji: String
     
-    /// Returns a deterministic challenge for the current day.
-    /// The same challenge persists all day, then changes the next day.
+    // Returns a deterministic challenge for the current day.
     static func today() -> DailyChallenge {
         let calendar = Calendar.current
         let day = calendar.ordinality(of: .day, in: .era, for: Date()) ?? 0

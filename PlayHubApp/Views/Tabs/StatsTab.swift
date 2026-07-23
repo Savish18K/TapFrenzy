@@ -51,7 +51,7 @@ struct StatsTab: View {
                 .pickerStyle(.segmented)
                 .padding(.horizontal)
                 .padding(.bottom, 24)
-                .colorScheme(.dark) // ensure picker looks good on black background
+                .colorScheme(.dark) 
                 
                 ScrollView {
                     VStack(spacing: 24) {

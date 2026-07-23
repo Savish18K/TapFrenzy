@@ -40,7 +40,7 @@ struct LightItUpView: View {
 
     let roundTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
-    // Score thresholds: L1=0, L2=30, L3=70, L4=120
+    // Score thresholds L1=0, L2=30, L3=70, L4=120
     let levels = [
         Level(cardCount: 3, litWindow: 2.0, litCount: 1, color: .green,  name: "L1", scoreThreshold: 0),
         Level(cardCount: 4, litWindow: 1.6, litCount: 1, color: .blue,   name: "L2", scoreThreshold: 30),
@@ -55,7 +55,7 @@ struct LightItUpView: View {
     }
 
   
-    // marks: Body
+    // body
     
     var body: some View {
         ZStack {
@@ -76,7 +76,7 @@ struct LightItUpView: View {
                 gameScreen
             }
 
-            // Level-up overlay
+            // Level up overlay
             if showLevelUp {
                 Color.white.opacity(0.12)
                     .ignoresSafeArea()
@@ -115,7 +115,7 @@ struct LightItUpView: View {
     }
 
   
-    // marks : Start screen
+    // marks Start screen
 
     var startScreen: some View {
         VStack(spacing: 30) {
@@ -192,12 +192,11 @@ struct LightItUpView: View {
     }
 
    
-    // marks : Game screen
+    // marks  Game screen
 
     var gameScreen: some View {
         VStack(spacing: 0) {
 
-            // HUD
             HStack {
               
                 VStack(alignment: .leading, spacing: 2) {
@@ -210,7 +209,7 @@ struct LightItUpView: View {
 
                 Spacer()
 
-                // Lives — hearts
+                // Lives hearts
                 VStack(spacing: 4) {
                     HStack(spacing: 6) {
                         ForEach(0..<4) { i in
@@ -238,7 +237,7 @@ struct LightItUpView: View {
             .padding(.horizontal, 24)
             .padding(.top, 60)
 
-            // Score-based level progress bar
+            // Score based level progress bar
             GeometryReader { geo in
                 let nextThreshold = currentLevel < levels.count - 1
                     ? levels[currentLevel + 1].scoreThreshold
@@ -287,7 +286,7 @@ struct LightItUpView: View {
     }
 
 
-    // marks : Game over screen
+    // marks Game over screen
 
     var gameOverScreen: some View {
         VStack(spacing: 24) {
@@ -357,7 +356,7 @@ struct LightItUpView: View {
     }
 
     
-    // marks : Game logic
+    // marks Game logic
    
 
     func startGame() {
@@ -452,7 +451,7 @@ struct LightItUpView: View {
          
             checkLevelUp()
         } else {
-            // Wrong tap — lose a life
+            // Wrong tap lose a life
             loseLife()
         }
     }
@@ -493,7 +492,7 @@ struct LightItUpView: View {
             self.showLevelUp = false
         }
 
-        // 0.8 s grace period after level-up
+        // 0.8 s grace period after level up
         scheduleNextLight(after: 0.8)
     }
 }

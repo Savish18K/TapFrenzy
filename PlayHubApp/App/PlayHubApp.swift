@@ -1,7 +1,4 @@
-//
 //  PlayHubApp.swift
-//  PlayHubApp
-//
 
 import SwiftUI
 

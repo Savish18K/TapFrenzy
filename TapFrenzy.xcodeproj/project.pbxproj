@@ -18,8 +18,6 @@
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		EF77F5DB2FD9394B00D55EE7 /* PlayHubApp */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = PlayHubApp;
 			sourceTree = "<group>";
 		};

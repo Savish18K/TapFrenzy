@@ -2,6 +2,7 @@ import Foundation
 import Combine
 
 enum QuizState {
+    case setup
     case loading
     case loaded
     case failed
@@ -17,6 +18,8 @@ class QuizRushVM: ObservableObject {
     @Published var state: QuizState = .loading
     @Published var selectedAnswer: String? = nil
     @Published var isCorrect: Bool? = nil
+    @Published var selectedCategory: TriviaCategory = .sports
+    @Published var selectedDifficulty: TriviaDifficulty = .medium
     
     // Cache shuffled answers so they don't reshuffle on re-render
     private var shuffledAnswersCache: [String: [String]] = [:]
@@ -32,13 +35,43 @@ class QuizRushVM: ObservableObject {
         currentIndex >= questions.count - 1
     }
     
-    func load() async {
+    init() {
+        state = .setup
+    }
+    
+    func load(
+        category: TriviaCategory? = nil,
+        difficulty: TriviaDifficulty? = nil
+    ) async {
+        if let category {
+            selectedCategory = category
+        }
+        
+        if let difficulty {
+            selectedDifficulty = difficulty
+        }
+        
         await MainActor.run {
             state = .loading
         }
         
         do {
-            let fetched = try await service.fetchQuestions()
+            let fetched = try await service.fetchQuestions(
+                category: selectedCategory,
+                difficulty: selectedDifficulty
+            )
+            
+            guard !fetched.isEmpty else {
+                await MainActor.run {
+                    questions = []
+                    shuffledAnswersCache = [:]
+                    selectedAnswer = nil
+                    isCorrect = nil
+                    state = .failed
+                }
+                return
+            }
+            
             await MainActor.run {
                 questions = fetched
                 currentIndex = 0
@@ -58,6 +91,17 @@ class QuizRushVM: ObservableObject {
                 state = .failed
             }
         }
+    }
+    
+    func resetToSetup() {
+        questions = []
+        currentIndex = 0
+        score = 0
+        streak = 0
+        selectedAnswer = nil
+        isCorrect = nil
+        shuffledAnswersCache = [:]
+        state = .setup
     }
     
     func selectAnswer(_ answer: String) {
@@ -87,7 +131,7 @@ class QuizRushVM: ObservableObject {
         }
     }
     
-    /// Stable shuffled answers for the current question (won't change on re-render)
+    // Stable shuffled answers for the current question . 
     var currentShuffledAnswers: [String] {
         guard let q = currentQuestion else { return [] }
         return shuffledAnswersCache[q.id] ?? q.shuffledAnswers

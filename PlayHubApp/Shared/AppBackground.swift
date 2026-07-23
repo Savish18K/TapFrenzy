@@ -1,7 +1,6 @@
 import SwiftUI
 
 // Central gradient background used across all screens.
-// Premium dark cinematic game app aesthetic.
 struct AppBackground: View {
     var body: some View {
         ZStack {

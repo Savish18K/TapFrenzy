@@ -6,7 +6,7 @@ private let optionColors: [Color] = [
     Color(red: 0.18, green: 0.52, blue: 1.00),  // A – electric blue
     Color(red: 1.00, green: 0.25, blue: 0.55),  // B – hot pink
     Color(red: 0.05, green: 0.80, blue: 0.65),  // C – cyan-teal
-    Color(red: 1.00, green: 0.70, blue: 0.05)   // D – amber
+    Color(red: 1.00, green: 0.70, blue: 0.05)   // D – yellow
 ]
 
 struct QuizRushView: View {
@@ -54,6 +54,7 @@ struct QuizRushView: View {
 
             // ── Content
             switch viewModel.state {
+            case .setup: setupView
             case .loading: loadingView
             case .failed:  failedView
             case .loaded:
@@ -74,12 +75,134 @@ struct QuizRushView: View {
             .padding(.leading, 16)
             .padding(.top, 8)
         }
-        .onAppear {
-            Task {
-                if viewModel.questions.isEmpty {
-                    await viewModel.load()
+    }
+    
+    // mark: Setup
+    var setupView: some View {
+        ScrollView(showsIndicators: false) {
+            VStack(alignment: .leading, spacing: 24) {
+                Spacer().frame(height: 72)
+                
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Quiz Rush")
+                        .font(.system(size: 36, weight: .black))
+                        .foregroundStyle(
+                            LinearGradient(colors: [accentA, accentB],
+                                           startPoint: .leading, endPoint: .trailing)
+                        )
+                    Text("Pick your question set")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundColor(.gray)
                 }
+                .padding(.horizontal, 24)
+                
+                VStack(alignment: .leading, spacing: 14) {
+                    Text("CATEGORY")
+                        .font(.system(size: 12, weight: .black))
+                        .foregroundColor(accentC.opacity(0.9))
+                    
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 132), spacing: 10)], spacing: 10) {
+                        ForEach(TriviaCategory.allCases) { category in
+                            optionChip(
+                                title: category.rawValue,
+                                isSelected: viewModel.selectedCategory == category,
+                                color: categoryAccent(for: category)
+                            ) {
+                                viewModel.selectedCategory = category
+                            }
+                        }
+                    }
+                }
+                .padding(.horizontal, 24)
+                
+                VStack(alignment: .leading, spacing: 14) {
+                    Text("DIFFICULTY")
+                        .font(.system(size: 12, weight: .black))
+                        .foregroundColor(accentD.opacity(0.9))
+                    
+                    HStack(spacing: 10) {
+                        ForEach(TriviaDifficulty.allCases) { difficulty in
+                            optionChip(
+                                title: difficulty.rawValue,
+                                isSelected: viewModel.selectedDifficulty == difficulty,
+                                color: difficultyAccent(for: difficulty)
+                            ) {
+                                viewModel.selectedDifficulty = difficulty
+                            }
+                        }
+                    }
+                }
+                .padding(.horizontal, 24)
+                
+                Button {
+                    startQuiz()
+                } label: {
+                    HStack(spacing: 10) {
+                        Image(systemName: "play.fill")
+                        Text("START QUIZ")
+                    }
+                    .font(.system(size: 17, weight: .black))
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 17)
+                    .background(
+                        LinearGradient(colors: [accentA, accentB],
+                                       startPoint: .leading, endPoint: .trailing)
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                    .shadow(color: accentA.opacity(0.35), radius: 14)
+                }
+                .padding(.horizontal, 24)
+                .padding(.top, 4)
+                
+                Spacer().frame(height: 36)
             }
+        }
+    }
+    
+    func optionChip(title: String, isSelected: Bool, color: Color, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: 8) {
+                if isSelected {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.system(size: 14, weight: .bold))
+                }
+                Text(title)
+                    .font(.system(size: 14, weight: .bold))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.78)
+            }
+            .foregroundColor(isSelected ? .white : Color.white.opacity(0.72))
+            .frame(maxWidth: .infinity)
+            .frame(height: 44)
+            .padding(.horizontal, 10)
+            .background(
+                RoundedRectangle(cornerRadius: 14)
+                    .fill(color.opacity(isSelected ? 0.28 : 0.10))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 14)
+                    .stroke(color.opacity(isSelected ? 0.9 : 0.28), lineWidth: isSelected ? 2 : 1)
+            )
+        }
+        .animation(.spring(response: 0.25, dampingFraction: 0.75), value: isSelected)
+    }
+    
+    func categoryAccent(for category: TriviaCategory) -> Color {
+        switch category {
+        case .any, .generalKnowledge: return accentA
+        case .sports, .videoGames: return accentC
+        case .history, .geography: return accentD
+        case .music, .movies: return accentB
+        case .science, .computers: return Color(red: 0.55, green: 0.45, blue: 1.00)
+        }
+    }
+    
+    func difficultyAccent(for difficulty: TriviaDifficulty) -> Color {
+        switch difficulty {
+        case .easy: return accentC
+        case .medium: return accentD
+        case .hard: return accentB
         }
     }
 
@@ -119,7 +242,7 @@ struct QuizRushView: View {
                 Text("Couldn't Load Questions")
                     .font(.system(size: 22, weight: .bold))
                     .foregroundColor(.white)
-                Text("Check your connection and try again.")
+                Text("Check your connection or pick a different quiz setup.")
                     .font(.subheadline)
                     .foregroundColor(.gray)
                     .multilineTextAlignment(.center)
@@ -138,6 +261,14 @@ struct QuizRushView: View {
                                        startPoint: .leading, endPoint: .trailing)
                     )
                     .clipShape(Capsule())
+            }
+            Button {
+                showResults = false
+                viewModel.resetToSetup()
+            } label: {
+                Text("Change Options")
+                    .foregroundColor(.gray)
+                    .font(.subheadline)
             }
             Button { dismiss() } label: {
                 Text("Back to Home")
@@ -441,60 +572,63 @@ struct QuizRushView: View {
    
     var resultsView: some View {
         ScrollView(showsIndicators: false) {
-            VStack(spacing: 28) {
-                Spacer().frame(height: 60)
+            VStack(spacing: 30) {
+                Spacer().frame(height: 36)
 
-                // Icon
-                ZStack {
-                    Circle()
-                        .fill(
-                            LinearGradient(
-                                colors: [accentA.opacity(0.3), accentB.opacity(0.3), accentC.opacity(0.3)],
-                                startPoint: .topLeading, endPoint: .bottomTrailing
+                // Icon & Title Group
+                VStack(spacing: 16) {
+                    ZStack {
+                        Circle()
+                            .fill(
+                                LinearGradient(
+                                    colors: [accentA.opacity(0.3), accentB.opacity(0.3), accentC.opacity(0.3)],
+                                    startPoint: .topLeading, endPoint: .bottomTrailing
+                                )
                             )
-                        )
-                        .frame(width: 120, height: 120)
-                        .overlay(
-                            Circle().stroke(
-                                LinearGradient(colors: [accentA, accentB, accentC, accentD],
-                                               startPoint: .topLeading, endPoint: .bottomTrailing),
-                                lineWidth: 2
+                            .frame(width: 82, height: 82)
+                            .overlay(
+                                Circle().stroke(
+                                    LinearGradient(colors: [accentA, accentB, accentC, accentD],
+                                                   startPoint: .topLeading, endPoint: .bottomTrailing),
+                                    lineWidth: 2
+                                )
                             )
-                        )
-                    Text(viewModel.score >= highScore && viewModel.score > 0 ? "🏆" : "🧠")
-                        .font(.system(size: 54))
-                }
+                        Text(viewModel.score >= highScore && viewModel.score > 0 ? "🏆" : "🧠")
+                            .font(.system(size: 36))
+                    }
 
-                VStack(spacing: 8) {
-                    Text("QUIZ COMPLETE!")
-                        .font(.system(size: 30, weight: .black))
-                        .foregroundStyle(
-                            LinearGradient(colors: [accentA, accentB],
-                                           startPoint: .leading, endPoint: .trailing)
-                        )
+                    VStack(spacing: 8) {
+                        Text("QUIZ COMPLETE!")
+                            .font(.system(size: 25, weight: .black))
+                            .foregroundStyle(
+                                LinearGradient(colors: [accentA, accentB],
+                                               startPoint: .leading, endPoint: .trailing)
+                            )
 
-                    if viewModel.score >= highScore && viewModel.score > 0 {
-                        HStack(spacing: 4) {
-                            Text("⭐️")
-                            Text("NEW HIGH SCORE!")
-                                .font(.system(size: 14, weight: .black))
-                            Text("⭐️")
+                        if viewModel.score >= highScore && viewModel.score > 0 {
+                            HStack(spacing: 4) {
+                                Text("⭐️")
+                                Text("NEW HIGH SCORE!")
+                                    .font(.system(size: 14, weight: .black))
+                                Text("⭐️")
+                            }
+                            .foregroundColor(accentD)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 5)
+                            .background(Capsule().fill(accentD.opacity(0.15)))
+                            .overlay(Capsule().stroke(accentD.opacity(0.5), lineWidth: 1.5))
+                            .padding(.top, 4)
                         }
-                        .foregroundColor(accentD)
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 5)
-                        .background(Capsule().fill(accentD.opacity(0.15)))
-                        .overlay(Capsule().stroke(accentD.opacity(0.5), lineWidth: 1.5))
                     }
                 }
 
                 // Score card
                 VStack(spacing: 4) {
                     Text("FINAL SCORE")
-                        .font(.system(size: 12, weight: .black))
+                        .font(.system(size: 11, weight: .black))
                         .foregroundColor(.gray)
                     Text("\(viewModel.score)")
-                        .font(.system(size: 76, weight: .black))
+                        .font(.system(size: 54, weight: .black))
                         .foregroundStyle(
                             LinearGradient(colors: [accentA, accentC],
                                            startPoint: .leading, endPoint: .trailing)
@@ -502,17 +636,17 @@ struct QuizRushView: View {
                         .contentTransition(.numericText())
                     if viewModel.score < highScore {
                         Text("Best: \(highScore)")
-                            .font(.caption)
+                            .font(.system(size: 13, weight: .semibold))
                             .foregroundColor(.gray)
                     }
                 }
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 28)
+                .padding(.vertical, 20)
                 .background(
-                    RoundedRectangle(cornerRadius: 22)
+                    RoundedRectangle(cornerRadius: 18)
                         .fill(cardBg)
                         .overlay(
-                            RoundedRectangle(cornerRadius: 22)
+                            RoundedRectangle(cornerRadius: 18)
                                 .stroke(
                                     LinearGradient(colors: [accentA.opacity(0.5), accentC.opacity(0.5)],
                                                    startPoint: .leading, endPoint: .trailing),
@@ -520,22 +654,22 @@ struct QuizRushView: View {
                                 )
                         )
                 )
-                .padding(.horizontal, 24)
+                .padding(.horizontal, 18)
 
                 // Buttons
-                VStack(spacing: 12) {
+                VStack(spacing: 16) {
                     ShareLink(item: "I just scored \(viewModel.score) on Quiz Rush — beat that! 🧠") {
                         Text("SHARE SCORE")
-                            .font(.system(size: 17, weight: .black))
+                            .font(.system(size: 15, weight: .black))
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
-                            .padding(.vertical, 17)
+                            .padding(.vertical, 14)
                             .background(
                                 LinearGradient(colors: [accentC, accentA],
                                                startPoint: .leading, endPoint: .trailing)
                             )
-                            .clipShape(RoundedRectangle(cornerRadius: 16))
-                            .shadow(color: accentC.opacity(0.4), radius: 12)
+                            .clipShape(RoundedRectangle(cornerRadius: 14))
+                            .shadow(color: accentC.opacity(0.32), radius: 9)
                     }
                     
                     Button {
@@ -543,48 +677,82 @@ struct QuizRushView: View {
                         Task { await viewModel.load() }
                     } label: {
                         Text("PLAY AGAIN")
-                            .font(.system(size: 17, weight: .black))
+                            .font(.system(size: 15, weight: .black))
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
-                            .padding(.vertical, 17)
+                            .padding(.vertical, 14)
                             .background(
                                 LinearGradient(colors: [accentA, accentB],
                                                startPoint: .leading, endPoint: .trailing)
                             )
-                            .clipShape(RoundedRectangle(cornerRadius: 16))
-                            .shadow(color: accentA.opacity(0.4), radius: 12)
+                            .clipShape(RoundedRectangle(cornerRadius: 14))
+                            .shadow(color: accentA.opacity(0.32), radius: 9)
+                    }
+                    
+                    Button {
+                        showResults = false
+                        viewModel.resetToSetup()
+                    } label: {
+                        HStack(spacing: 8) {
+                            Image(systemName: "slider.horizontal.3")
+                            Text("Change Options")
+                                .font(.system(size: 14, weight: .bold))
+                        }
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                        .background(RoundedRectangle(cornerRadius: 14).fill(cardBg))
+                        .overlay(RoundedRectangle(cornerRadius: 14)
+                            .stroke(accentA.opacity(0.5), lineWidth: 1.5))
                     }
 
                     NavigationLink(destination: StatsTab(initialMode: .quizRush)) {
                         HStack(spacing: 8) {
                             Image(systemName: "trophy.fill").foregroundColor(accentD)
                             Text("Leaderboard")
-                                .font(.system(size: 16, weight: .bold))
+                                .font(.system(size: 14, weight: .bold))
                                 .foregroundColor(.white)
                         }
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 15)
-                        .background(RoundedRectangle(cornerRadius: 16).fill(cardBg))
-                        .overlay(RoundedRectangle(cornerRadius: 16)
+                        .padding(.vertical, 12)
+                        .background(RoundedRectangle(cornerRadius: 14).fill(cardBg))
+                        .overlay(RoundedRectangle(cornerRadius: 14)
                             .stroke(accentD.opacity(0.6), lineWidth: 1.5))
                     }
 
                     Button { dismiss() } label: {
-                        Text("Back to Home")
-                            .font(.system(size: 15, weight: .semibold))
-                            .foregroundColor(.gray)
+                        HStack(spacing: 8) {
+                            Image(systemName: "house.fill")
+                            Text("Back to Home")
+                                .font(.system(size: 14, weight: .bold))
+                        }
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                        .background(RoundedRectangle(cornerRadius: 14).fill(cardBg))
+                        .overlay(RoundedRectangle(cornerRadius: 14)
+                            .stroke(Color.gray.opacity(0.5), lineWidth: 1.5))
                     }
-                    .padding(.top, 4)
                 }
-                .padding(.horizontal, 24)
+                .padding(.horizontal, 18)
 
-                Spacer().frame(height: 40)
+                Spacer().frame(height: 32)
             }
         }
     }
 
-  
+   
     // mark : Logic
+    
+    func startQuiz() {
+        showResults = false
+        Task {
+            await viewModel.load(
+                category: viewModel.selectedCategory,
+                difficulty: viewModel.selectedDifficulty
+            )
+        }
+    }
    
     func handleAnswerTap(_ answer: String, question: Question) {
         viewModel.selectAnswer(answer)
