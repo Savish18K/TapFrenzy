@@ -5,7 +5,7 @@ import CoreLocation
 private let optionColors: [Color] = [
     Color(red: 0.18, green: 0.52, blue: 1.00),  // A – electric blue
     Color(red: 1.00, green: 0.25, blue: 0.55),  // B – hot pink
-    Color(red: 0.05, green: 0.80, blue: 0.65),  // C – cyan-teal
+    Color(red: 0.05, green: 0.80, blue: 0.65),  // C – blue
     Color(red: 1.00, green: 0.70, blue: 0.05)   // D – yellow
 ]
 
@@ -20,7 +20,7 @@ struct QuizRushView: View {
     @AppStorage("globalPlayerName") private var globalPlayerName = "Anonymous"
     @State private var cardScale: CGFloat = 1.0
 
-    // ── Palette
+    // Palette
     let accentA = optionColors[0]
     let accentB = optionColors[1]
     let accentC = optionColors[2]
@@ -30,7 +30,7 @@ struct QuizRushView: View {
 
     var body: some View {
         ZStack {
-            // ── Background
+            // Background
             AppBackground()
 
             // Vivid ambient blobs
@@ -52,7 +52,7 @@ struct QuizRushView: View {
                 .blur(radius: 80)
                 .offset(x: -60, y: 300)
 
-            // ── Content
+            // Content
             switch viewModel.state {
             case .setup: setupView
             case .loading: loadingView
@@ -77,7 +77,7 @@ struct QuizRushView: View {
         }
     }
     
-    // mark: Setup
+    // Setup
     var setupView: some View {
         ScrollView(showsIndicators: false) {
             VStack(alignment: .leading, spacing: 24) {
@@ -206,7 +206,7 @@ struct QuizRushView: View {
         }
     }
 
-    // mark: Loading
+    // Loading view.
     var loadingView: some View {
         VStack(spacing: 20) {
             ZStack {
@@ -227,7 +227,7 @@ struct QuizRushView: View {
         }
     }
 
-    // mark: Failed
+    // Quiz Failed
     var failedView: some View {
         VStack(spacing: 28) {
             ZStack {
@@ -279,7 +279,7 @@ struct QuizRushView: View {
     }
 
     
-    // mark : Quiz
+    // Quiz
 
     var quizView: some View {
         VStack(spacing: 0) {
@@ -568,7 +568,7 @@ struct QuizRushView: View {
     }
 
    
-    // mark : Results
+    // Results
    
     var resultsView: some View {
         ScrollView(showsIndicators: false) {
@@ -742,8 +742,7 @@ struct QuizRushView: View {
     }
 
    
-    // mark : Logic
-    
+    // Logic
     func startQuiz() {
         showResults = false
         Task {
@@ -768,7 +767,7 @@ struct QuizRushView: View {
             withAnimation(.default) { shakeAmount += 1 }
         }
 
-        // 2.5 s so users can clearly read the answer feedback before moving on
+        // 2.5s duration so users can clearly read the answer feedback before moving on
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
             if viewModel.isLastQuestion {
                 if viewModel.score > highScore { highScore = viewModel.score }
