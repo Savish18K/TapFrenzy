@@ -75,14 +75,14 @@ struct TriviaAPI {
         var request = URLRequest(url: url)
         request.timeoutInterval = 12
         
-        let (data, response) = try await URLSession.shared.data(for: request)
-        
-        guard let httpResponse = response as? HTTPURLResponse,
-              httpResponse.statusCode == 200 else {
-            throw TriviaError.badResponse
-        }
-        
         do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            
+            guard let httpResponse = response as? HTTPURLResponse,
+                  httpResponse.statusCode == 200 else {
+                throw TriviaError.badResponse
+            }
+            
             let decoded = try JSONDecoder().decode(TriviaResponse.self, from: data)
             guard decoded.response_code == 0 else {
                 throw TriviaError.noResults

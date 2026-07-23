@@ -239,10 +239,10 @@ struct QuizRushView: View {
                     .foregroundColor(accentB)
             }
             VStack(spacing: 8) {
-                Text("Couldn't Load Questions")
+                Text("API Rate Limit Hit")
                     .font(.system(size: 22, weight: .bold))
                     .foregroundColor(.white)
-                Text("Check your connection or pick a different quiz setup.")
+                Text("OpenTDB rate-limits rapid requests. Please wait 5 seconds and try again!")
                     .font(.subheadline)
                     .foregroundColor(.gray)
                     .multilineTextAlignment(.center)
