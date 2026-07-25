@@ -1,4 +1,4 @@
-TapFrenzy 
+PlayHubApp
 
 A multi-game iOS app built with SwiftUI iOS App. 
 Games
